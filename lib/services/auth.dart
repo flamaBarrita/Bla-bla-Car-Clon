@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
-import 'home_page.dart';
-import 'login.dart';
+import '../screens/home_page.dart';
+import '../screens/login/login.dart';
 
 //Clase padre Auth que hereda stateful ya que es dinamica y necesita actualizar su estado
 class Auth extends StatefulWidget {
@@ -30,6 +30,7 @@ class _AuthState extends State<Auth> {
     //Utilizamos mounted para verificar que la pantalla sigue activa antes de seguir con el estado
     if (mounted) {
       setState(() {
+        //funcion vacia
         _autenticado = isLoggedIn;
         _cargando = false;
       });
@@ -43,6 +44,6 @@ class _AuthState extends State<Auth> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     //Si esta autenticado, mostramos la HomePage, si no, mostramos la pantalla de Login
-    return _autenticado ? HomePage() : LoginPage();
+    return _autenticado ? ProfilePage() : LoginPage();
   }
 }

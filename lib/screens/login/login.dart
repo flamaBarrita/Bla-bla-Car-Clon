@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'auth_service.dart';
-import 'widgets/boton_principal.dart';
-import 'widgets/entrada_datos.dart';
+import '../home_page.dart';
+import '../../services/auth_service.dart';
+
+import '/widgets/boton_principal.dart';
+import '/widgets/entrada_datos.dart';
+
+import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -10,6 +13,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  String _userName = "Cargando...";
   // Entradas del usuario
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -37,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
     if (isLoggedIn && mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => ProfilePage()),
       );
     }
   }
@@ -55,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
       if (userLoggeado && mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => ProfilePage()),
         );
       }
     } catch (e) {
@@ -147,7 +151,12 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.grey[400], fontSize: 16),
                     ),
                     GestureDetector(
-                      onTap: () => print("Ir a registro"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUpPage()),
+                        );
+                      },
                       child: const Text(
                         "Registrarse",
                         style: TextStyle(

@@ -46,3 +46,6 @@ app.*.map.json
 
 
 /lib/amplifyconfiguration.dart
+
+# Variables de entorno secretas
+.env

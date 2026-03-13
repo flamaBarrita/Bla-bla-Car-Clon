@@ -5,7 +5,7 @@ import 'login/login.dart';
 import '../widgets/navegacion_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/providers/app_providers.dart';
-//import '../services/push_notifications.dart';
+import '../services/push_notifications.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -33,7 +33,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final apiService = ref.read(apiServiceProvider);
-      //PushNotificationService.inicializarYGuardarToken(apiService);
+      PushNotificationService.inicializarYGuardarToken(apiService);
       _cargarPerfil(); // Cargamos el perfil apenas se abre la pantalla
     });
   }

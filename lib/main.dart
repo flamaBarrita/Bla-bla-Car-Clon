@@ -4,11 +4,15 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'services/auth.dart';
 import 'services/amplify_config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+  runApp(
+    // Envolvemos toda la aplicación con ProviderScope para usar Riverpod
+    ProviderScope(child: MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {

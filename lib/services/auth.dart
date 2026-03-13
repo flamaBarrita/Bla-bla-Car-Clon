@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'auth_service.dart';
 import '../screens/home_page.dart';
 import '../screens/login/login.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_providers.dart';
 
 //Clase padre Auth que hereda stateful ya que es dinamica y necesita actualizar su estado
-class Auth extends StatefulWidget {
+class Auth extends ConsumerStatefulWidget {
   @override
-  _AuthState createState() => _AuthState();
+  ConsumerState<Auth> createState() => _AuthState();
 }
 
-class _AuthState extends State<Auth> {
+class _AuthState extends ConsumerState<Auth> {
   bool _cargando = true;
   bool _autenticado = false;
-
-  // Instanciamos el servicio de autenticación para usarlo en esta clase
-  final _authService = AuthService();
 
   //llamamos al constructor de la clase para ir verificando al user
   @override
@@ -25,8 +23,23 @@ class _AuthState extends State<Auth> {
 
   //Función que revisa si el usuario ya tiene una sesión activa
   void _checkUser() async {
+    final authService = ref.read(
+      authServiceProvider,
+    ); //obtenemos servicio de riverpod
     //validamos con el servicio de autenticación si el usuario ya tiene una sesión activa
-    bool isLoggedIn = await _authService.checkSession();
+    bool isLoggedIn = await authService.checkSession();
+
+    if (isLoggedIn) {
+      // Si Cognito dice que hay sesión, intentamos obtener el ID del usuario
+      final userId = await authService.getCurrentUserId();
+
+      if (userId != null) {
+        //Lo guardamos en la boveda
+        ref.read(currentUserIdProvider.notifier).setUserId(userId);
+      } else {
+        isLoggedIn = false;
+      }
+    }
     //Utilizamos mounted para verificar que la pantalla sigue activa antes de seguir con el estado
     if (mounted) {
       setState(() {

@@ -8,7 +8,7 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._internal();
 
-  final String _baseUrl = 'http://192.168.1.76:8000';
+  final String _baseUrl = 'http://140.84.167.187:8000';
 
   final AuthService _authService = AuthService();
 
@@ -59,6 +59,7 @@ class ApiService {
     required String departureTime,
     required double price,
     required int seatsAvailable,
+    required String encodedPolyline,
   }) async {
     try {
       final url = Uri.parse('$_baseUrl/trips/$driverId');
@@ -79,6 +80,7 @@ class ApiService {
           "departure_time": departureTime,
           "price": price,
           "seats_available": seatsAvailable,
+          "encoded_polyline": encodedPolyline,
         }),
       );
 
@@ -98,6 +100,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> solicitarUnirse({
     required int tripId,
+    required String senderId,
     required String passengerId,
     required String passengerName,
     required String passengerPhoto,
@@ -117,6 +120,7 @@ class ApiService {
           "passenger_photo": passengerPhoto,
           "passenger_rating": passengerRating,
           "seats_requested": seatsRequested,
+          "sender_id": senderId,
         }),
       );
 
@@ -256,5 +260,92 @@ class ApiService {
       print("Error buscando viajes: $e");
     }
     return [];
+  }
+
+  Future<bool> eliminarViaje(String viajeId) async {
+    try {
+      final headers = await _getSecureHeaders(); // Tu función de los tokens
+      // Ajusta la URL según tu FastAPI
+      final response = await http.patch(
+        Uri.parse('$_baseUrl/trips/$viajeId/cancelar'),
+        headers: headers,
+      );
+
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print("Error al eliminar viaje: $e");
+      return false;
+    }
+  }
+
+  // --- ACTUALIZAR FCM TOKEN EN POSTGRES ---
+  Future<void> actualizarTokenNotificaciones(String token) async {
+    try {
+      final headers = await _getSecureHeaders();
+
+      final body = jsonEncode({"fcm_token": token});
+
+      final response = await http.patch(
+        Uri.parse('$_baseUrl/api/users/update-fcm-token'),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        print("✅ FCM Token guardado exitosamente en la base de datos");
+      } else {
+        print("❌ Error al guardar FCM Token: ${response.body}");
+      }
+    } catch (e) {
+      print("Error de red al enviar FCM Token: $e");
+    }
+  }
+
+  // --- OBTENER LOS VIAJES APROBADOS DEL PASAJERO ---
+  Future<List<dynamic>?> obtenerMisViajesAprobados(String passengerId) async {
+    try {
+      // 1. Nos ponemos el gafete de seguridad (Token de Cognito)
+      final headers = await _getSecureHeaders();
+
+      // 2. Viajamos a FastAPI usando la ruta exacta que creamos en Python
+      final response = await http.get(
+        Uri.parse('$_baseUrl/mis-viajes/aprobados/$passengerId'),
+        headers: headers,
+      );
+
+      // 3. Evaluamos lo que nos contestó el servidor
+      if (response.statusCode == 200) {
+        // Traducimos el texto gigante (JSON) a una Lista que Flutter entienda
+        return jsonDecode(response.body);
+      } else {
+        print("Error en FastAPI: Código ${response.statusCode}");
+        // Si el servidor marca error, devolvemos null para que la app no explote
+        return null;
+      }
+    } catch (e) {
+      // Atrapamos errores de internet (ej. si el usuario apagó el WiFi)
+      print("Error de conexión al obtener viajes aprobados: $e");
+      return null;
+    }
+  }
+
+  // Cancela un asiento ya aprobado por parte del pasajero
+  Future<bool> cancelarAsientoPasajero(
+    String tripId,
+    String passengerId,
+  ) async {
+    try {
+      final headers = await _getSecureHeaders();
+
+      final response = await http.patch(
+        Uri.parse('$_baseUrl/trips/$tripId/pasajeros/$passengerId/cancelar'),
+        headers: headers,
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print("Error al cancelar asiento: $e");
+      return false;
+    }
   }
 }

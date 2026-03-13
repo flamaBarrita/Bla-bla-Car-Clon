@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart'; // Para el selector de fecha estilo iOS
-import 'package:intl/intl.dart'; // Para formatear la fecha (añade 'intl' a tu pubspec.yaml si no lo tienes)
-
-import '../../services/auth_service.dart';
+import 'package:intl/intl.dart'; // Para formatear la fecha
 import 'confirmar_email.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '/providers/app_providers.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignUpPage extends ConsumerStatefulWidget {
   @override
-  _SignUpPageState createState() => _SignUpPageState();
+  ConsumerState<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
-  // Controlador del Wizard (Paso a paso)
+class _SignUpPageState extends ConsumerState<SignUpPage> {
+  // Controlador del Wizard de registro
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _isLoading = false;
@@ -29,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final Color _bg = const Color(0xFF191919);
   final Color _blue = const Color(0xFF00AFF5);
 
-  // --- LÓGICA DE NAVEGACIÓN ---
+  // Lógica navegación entre las páginas del Wizard
   void _nextPage() {
     if (_currentPage < 3) {
       // Validaciones básicas antes de avanzar
@@ -53,12 +53,12 @@ class _SignUpPageState extends State<SignUpPage> {
         curve: Curves.easeInOut,
       );
     } else {
-      // Si estamos en la última página (Contraseña), hacemos el registro en Cognito
+      // Si estamos en la última página, hacemos el registro en Cognito
       _submitRegistration();
     }
   }
 
-  // --- LÓGICA DE REGISTRO EN COGNITO ---
+  // Lógica de registro en Cognito usando el AuthService
   Future<void> _submitRegistration() async {
     if (_passwordController.text.length < 8) {
       _showError("La contraseña debe tener al menos 8 caracteres.");
@@ -66,6 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     setState(() => _isLoading = true);
+    final authService = ref.read(authServiceProvider);
 
     try {
       final String formattedDate = DateFormat(
@@ -74,7 +75,7 @@ class _SignUpPageState extends State<SignUpPage> {
       final String fullName =
           "${_firstNameController.text.trim()} ${_lastNameController.text.trim()}";
 
-      await AuthService().signUp(
+      await authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         name: fullName,
@@ -102,17 +103,18 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  // Función para mostrar errores en un SnackBar
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message, style: const TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFFD32F2F), // Rojo similar a la imagen
-        behavior: SnackBarBehavior.floating, // Flotante estilo BlaBlaCar
+        backgroundColor: const Color(0xFFD32F2F),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  // --- CONSTRUCCIÓN DE LA UI ---
+  // Construcción de la UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(

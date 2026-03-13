@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
-
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import 'login/login.dart';
 import '../widgets/navegacion_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '/providers/app_providers.dart';
+//import '../services/push_notifications.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
+  const ProfilePage({super.key});
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   String _userName = "Cargando...";
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _prefController = TextEditingController();
   final TextEditingController _vehiclesController = TextEditingController();
+
+  bool _cargando = true;
+  Map<String, dynamic>? _datosPerfil;
 
   // Nuevos estados para controlar la vista
   bool _isFetching =
@@ -25,17 +31,37 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _cargarPerfil(); // Llamamos a la BD apenas se abre la pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final apiService = ref.read(apiServiceProvider);
+      //PushNotificationService.inicializarYGuardarToken(apiService);
+      _cargarPerfil(); // Cargamos el perfil apenas se abre la pantalla
+    });
   }
 
+  ApiService get apiService => ref.read(apiServiceProvider);
+  AuthService get authService => ref.read(authServiceProvider);
   // --- 1. LÓGICA: TRAER DATOS (GET) ---
   Future<void> _cargarPerfil() async {
-    final userId = await AuthService().getCurrentUserId();
+    final perfilCache = ref.read(userProfileProvider);
 
-    if (userId != null) {
-      final datos = await ApiService().obtenerPerfil(userId);
+    if (perfilCache != null) {
+      if (mounted) {
+        setState(() {
+          _userName = perfilCache['name'] ?? 'Usuario';
+          _bioController.text = perfilCache['biography'] ?? '';
+          _prefController.text = perfilCache['preferences'] ?? '';
+          _vehiclesController.text = perfilCache['vehicles'] ?? '';
+          _isFetching = false;
+        });
+      }
+      return; // Cortamos la ejecución aquí, ya no bajamos a hacer la petición.
+    }
+    final String? miId = ref.read(currentUserIdProvider);
+    if (miId != null) {
+      final datos = await apiService.obtenerPerfil(miId);
 
       if (datos != null && mounted) {
+        ref.read(userProfileProvider.notifier).setProfile(datos);
         // Llenamos las cajas de texto con lo que llegó de Postgres
         setState(() {
           _userName = datos['name'] ?? 'Usuario';
@@ -54,9 +80,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _guardarPerfil() async {
     setState(() => _isLoading = true);
 
-    final userId = await AuthService().getCurrentUserId();
+    final String? miId = ref.read(currentUserIdProvider);
 
-    if (userId == null) {
+    if (miId == null) {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error: No hay sesión activa')),
@@ -65,8 +91,8 @@ class _ProfilePageState extends State<ProfilePage> {
       return;
     }
 
-    final exito = await ApiService().guardarPerfil(
-      userId: userId,
+    final exito = await apiService.guardarPerfil(
+      userId: miId,
       biography: _bioController.text,
       preferences: _prefController.text,
       vehicles: _vehiclesController.text,
@@ -74,6 +100,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (mounted) {
       if (exito) {
+        final perfilViejo = ref.read(userProfileProvider) ?? {};
+        final perfilNuevo = {
+          ...perfilViejo,
+          'biography': _bioController.text, // Tus nuevos datos
+          'preferences': _prefController.text,
+          'vehicles': _vehiclesController.text,
+        };
+
+        // 3. ¡Lo metemos de vuelta a la bóveda!
+        // Esto hace que cualquier pantalla que lo esté viendo se actualice sola.
+        ref.read(userProfileProvider.notifier).setProfile(perfilNuevo);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -102,7 +139,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _signOut(BuildContext context) async {
     try {
-      await AuthService().signOut();
+      final authService = ref.read(authServiceProvider);
+      await authService.signOut();
+
+      //limpiamos la boveda
+      ref.invalidate(currentUserIdProvider);
+      ref.invalidate(userProfileProvider);
+      ref.invalidate(googleMapsServiceProvider);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => LoginPage()),
         (route) => false,
@@ -289,7 +332,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           const SizedBox(height: 20),
-
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.star_outline, color: Colors.white),
@@ -305,9 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () {},
           ),
           const Divider(color: Colors.grey),
-
           const Spacer(),
-
           SizedBox(
             width: double.infinity,
             height: 56,

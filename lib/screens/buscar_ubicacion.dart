@@ -15,10 +15,12 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
   final TextEditingController _searchController = TextEditingController();
   final GoogleMapsService _mapsService = GoogleMapsService();
 
+  // Lista de predicciones que vienen de Google
   List<dynamic> _predictions = [];
 
   bool _isProcessing = false;
 
+  // Función que se llama cada vez que el texto del TextField cambia
   void _onSearchChanged(String value) async {
     if (value.length > 2) {
       final results = await _mapsService.getAutocomplete(value);
@@ -34,14 +36,14 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
     setState(() => _isProcessing = true);
 
     try {
-      // 1. Verificar si el GPS está prendido
+      // Verificar si el GPS está prendido
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         _mostrarError('Por favor, enciende tu GPS para usar esta función.');
         return;
       }
 
-      // 2. Pedir permisos al usuario
+      // Pedir permisos al usuario
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -57,16 +59,16 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
         return;
       }
 
-      // 3. Sacar las coordenadas exactas
+      // Sacar las coordenadas exactas
       Position position = await Geolocator.getCurrentPosition();
       LatLng myCoords = LatLng(position.latitude, position.longitude);
 
-      // 4. Preguntarle a Google el nombre de la calle
+      // Preguntarle a Google el nombre de la calle
       String? myAddress = await _mapsService.getAddressFromLatLng(myCoords);
 
       if (!mounted) return;
 
-      // 5. Regresar los datos a la pantalla principal
+      // Regresar los datos a la pantalla principal
       if (Navigator.canPop(context)) {
         Navigator.pop(context, {
           'coords': myCoords,
@@ -95,7 +97,7 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
   void _selectPlace(String placeId, String description) async {
     if (_isProcessing) return;
 
-    // 1. ESCONDEMOS EL TECLADO FORZOSAMENTE
+    // ESCONDEMOS EL TECLADO FORZOSAMENTE
     FocusScope.of(context).unfocus();
 
     setState(() => _isProcessing = true);
@@ -105,8 +107,7 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
     if (!mounted) return;
 
     if (coords != null) {
-      // 2. Usamos Navigator.maybePop, que es la versión "segura" de pop.
-      // Si no puede regresar, no hará nada y no lanzará pantalla roja.
+      // Regresamos a la pantalla anterior con los datos del lugar seleccionado
       final puedeRegresar = await Navigator.maybePop(context, {
         'coords': coords,
         'name': description,
@@ -114,13 +115,9 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
 
       if (!puedeRegresar) {
         setState(() => _isProcessing = false);
-        // Si ves este mensaje en tu app, confirmamos el error de arquitectura
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Error: Esta pantalla se abrió sin historial. Verifica tu BottomNavBar.',
-            ),
-          ),
+              content: Text('No se pudo regresar a la pantalla anterior.')),
         );
       }
     } else {
@@ -144,7 +141,9 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
             } else {
-              print("⚠️ Intento de cerrar la pantalla raíz bloqueado");
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('No se puede regresar.')),
+              );
             }
           },
         ),
@@ -159,7 +158,7 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
       ),
       body: Stack(
         children: [
-          // CAPA 1: La Interfaz normal
+          // Pantalla principal con el TextField y las predicciones (si las hay)
           Column(
             children: [
               Padding(
@@ -189,8 +188,6 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                   ),
                 ),
               ),
-              // Opción de Ubicación Actual
-
               //spread operator para meter varios widgets en un if
               if (widget.title == '¿Desde dónde sales?') ...[
                 ListTile(
@@ -207,7 +204,8 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                     color: Colors.grey,
                     size: 16,
                   ),
-                  onTap: _useCurrentLocation, // <--- CONECTAMOS EL BOTÓN AQUÍ
+                  onTap:
+                      _useCurrentLocation, // Llamamos a la función para usar el GPS
                 ),
                 const Divider(color: Colors.grey, height: 1),
               ],
@@ -239,8 +237,6 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
               ),
             ],
           ),
-
-          // CAPA 2: La Pantalla de Carga (Solo aparece si _isProcessing es true)
           if (_isProcessing)
             Container(
               color: Colors.black.withOpacity(0.5),

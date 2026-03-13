@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
-import '../../services/api_service.dart';
 import '../home_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '/providers/app_providers.dart';
 
-class ConfirmEmailPage extends StatefulWidget {
+class ConfirmEmailPage extends ConsumerStatefulWidget {
   final String email;
-  final String password; // Recibimos la contraseña para el auto-login
-  final String name; // Recibimos el nombre para Postgres
+  final String password;
+  final String name;
 
   const ConfirmEmailPage({
     Key? key,
@@ -16,37 +16,40 @@ class ConfirmEmailPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ConfirmEmailPageState createState() => _ConfirmEmailPageState();
+  ConsumerState<ConfirmEmailPage> createState() => _ConfirmEmailPageState();
 }
 
-class _ConfirmEmailPageState extends State<ConfirmEmailPage> {
+class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage> {
   final TextEditingController _codeController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _confirmar() async {
+    //utilizamos los providers para obtener las instancias de los servicios
+    final authService = ref.read(authServiceProvider);
+    final apiService = ref.read(apiServiceProvider);
     setState(() => _isLoading = true);
     try {
-      // 1. Confirmamos el código con AWS
-      await AuthService().confirmSignUp(
+      // Confirmamos el código con Cognito
+      await authService.confirmSignUp(
         email: widget.email,
         code: _codeController.text.trim(),
       );
 
-      // 2. SOLUCIÓN AL BUG: Hacemos el Login automáticamente por detrás
-      await AuthService().signIn(widget.email, widget.password);
+      // Logeamos automaticamente al usuario para obtener el ID
+      await authService.signIn(widget.email, widget.password);
 
-      // 3. Obtenemos el ID real que Cognito nos acaba de asignar
-      final userId = await AuthService().getCurrentUserId();
+      // Obtener el ID del usuario autenticado
+      final userId = await authService.getCurrentUserId();
 
-      // 4. EL "TRIGGER": Mandamos a Postgres el ID y el Nombre
+      // Se triggera la creación del usuario en la db con el ID obtenido
       if (userId != null) {
-        await ApiService().registrarUsuarioInicial(
+        await apiService.registrarUsuarioInicial(
           userId: userId,
           name: widget.name,
         );
       }
 
-      // 5. ¡Todo listo! Mandamos al Home
+      // si el user sigue en la pantalla, navegamos a la homepage
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,

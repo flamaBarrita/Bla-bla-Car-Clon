@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../services/api_service.dart';
 import 'trip_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_providers.dart';
 
-class TripResultsScreen extends StatefulWidget {
+class TripResultsScreen extends ConsumerStatefulWidget {
   final String originName;
   final LatLng originCoords;
   final String destName;
@@ -18,11 +19,10 @@ class TripResultsScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _TripResultsScreenState createState() => _TripResultsScreenState();
+  ConsumerState<TripResultsScreen> createState() => _TripResultsScreenState();
 }
 
-class _TripResultsScreenState extends State<TripResultsScreen> {
-  final ApiService _apiService = ApiService();
+class _TripResultsScreenState extends ConsumerState<TripResultsScreen> {
   bool _isLoading = true;
   List<dynamic> _viajesDisponibles = [];
 
@@ -33,7 +33,8 @@ class _TripResultsScreenState extends State<TripResultsScreen> {
   }
 
   Future<void> _realizarBusqueda() async {
-    final resultados = await _apiService.buscarViajes(
+    final apiService = ref.read(apiServiceProvider);
+    final resultados = await apiService.buscarViajes(
       widget.originCoords.latitude,
       widget.originCoords.longitude,
       widget.destCoords.latitude,
@@ -134,10 +135,7 @@ class _TripResultsScreenState extends State<TripResultsScreen> {
                     itemCount: _viajesDisponibles.length,
                     itemBuilder: (context, index) {
                       // AQUÍ USAMOS NUESTRO NUEVO WIDGET LIMPIO
-                      return TripCard(
-                        viaje: _viajesDisponibles[index],
-                        apiService: _apiService,
-                      );
+                      return TripCard(viaje: _viajesDisponibles[index]);
                     },
                   ),
           ),

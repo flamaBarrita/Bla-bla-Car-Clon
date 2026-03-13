@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-// Importa aquí todas tus pantallas
 import '../screens/home_page.dart';
 import '../screens/publicar_ruta.dart';
 

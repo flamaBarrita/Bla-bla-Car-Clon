@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class GoogleMapsService {
-  // TODO: ¡Pon tu API Key aquí!
   static final String _apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
 
   // 1. Obtener sugerencias de direcciones (Autocomplete)
@@ -63,31 +62,60 @@ class GoogleMapsService {
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&alternatives=true&key=$_apiKey&language=es';
 
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-      if ((json['routes'] as List).isEmpty) return null;
+    try {
+      final response = await http.get(Uri.parse(url));
 
-      // Tomamos la primera ruta sugerida (la más rápida)
-      final route = json['routes'][0];
-      final leg = route['legs'][0];
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
 
-      // Decodificamos la línea azul
-      List<PointLatLng> result = PolylinePoints.decodePolyline(
-        route['overview_polyline']['points'],
-      );
+        // 🛡️ 1. ESCUDO DEFENSIVO: Verificamos qué nos respondió Google
+        if (json['status'] != 'OK') {
+          print('⚠️ Error de Google Maps: ${json['status']}');
+          if (json['error_message'] != null) {
+            print('Detalle: ${json['error_message']}');
+          }
+          return null; // Abortamos misión limpiamente, sin crashear la app
+        }
 
-      List<LatLng> polylineCoordinates = result
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
+        // 🛡️ 2. Verificamos que sí existan rutas
+        if (json['routes'] == null || (json['routes'] as List).isEmpty) {
+          print('⚠️ No se encontraron rutas viables para este trayecto.');
+          return null;
+        }
 
-      return {
-        'distance': leg['distance']['text'], // Ej. "456 km"
-        'duration': leg['duration']['text'], // Ej. "6 h 11 min"
-        'summary': route['summary'], // Ej. "México 135D"
-        'polyline': polylineCoordinates,
-      };
+        // Tomamos la primera ruta sugerida (la más rápida)
+        final route = json['routes'][0];
+        final leg = route['legs'][0];
+
+        // ⚡ 3. ¡EL TESORO PARA POSTGIS! Guardamos el string crudo
+        final String rawEncodedPolyline = route['overview_polyline']['points'];
+
+        // Decodificamos la línea azul para el mapa de Flutter
+        // (Nota: Asegúrate de instanciar PolylinePoints() si la librería lo requiere)
+        // ⚡ LA SOLUCIÓN: Agregamos el parámetro nombrado apiKey
+        // ⚡ LA SOLUCIÓN: Quitamos los paréntesis (). Ahora es un método estático.
+        List<PointLatLng> result = PolylinePoints.decodePolyline(
+          rawEncodedPolyline,
+        );
+        List<LatLng> polylineCoordinates = result
+            .map((point) => LatLng(point.latitude, point.longitude))
+            .toList();
+
+        return {
+          'distance': leg['distance']['text'], // Ej. "456 km"
+          'duration': leg['duration']['text'], // Ej. "6 h 11 min"
+          'summary': route['summary'], // Ej. "México 135D"
+          'polyline': polylineCoordinates, // Lista para dibujar en tu UI
+          'encodedPolyline':
+              rawEncodedPolyline, // ⚡ ¡El nuevo dato para tu backend!
+        };
+      } else {
+        print('Error del servidor al buscar ruta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error de conexión o parseo en getDirections: $e');
     }
+
     return null;
   }
 }

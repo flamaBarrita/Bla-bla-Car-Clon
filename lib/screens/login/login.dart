@@ -1,29 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '/providers/app_providers.dart';
 import '../home_page.dart';
-import '../../services/auth_service.dart';
-
 import '/widgets/boton_principal.dart';
 import '/widgets/entrada_datos.dart';
-
 import 'signup_page.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  String _userName = "Cargando...";
+class _LoginPageState extends ConsumerState<LoginPage> {
   // Entradas del usuario
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Instancia de nuestro servicio de lógica
-  final _authService = AuthService();
-
   bool _cargando = false;
 
-  // Colores
   final Color _backgroundColor = const Color(0xFF191919);
   final Color _textColor = Colors.white;
 
@@ -35,14 +29,22 @@ class _LoginPageState extends State<LoginPage> {
 
   // Verificar sesión al inicio
   Future<void> _checkSessionStatus() async {
-    // Usamos el AuthService para preguntar si hay sesión
-    final isLoggedIn = await _authService.checkSession();
+    final authService = ref.read(authServiceProvider);
 
+    // preguntamos a Cognito si hay sesión activa
+    final isLoggedIn = await authService.checkSession();
+
+    //si hay sesión, extraemos el ID y lo guardamos en Riverpod, luego vamos a ProfilePage
     if (isLoggedIn && mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ProfilePage()),
-      );
+      final userId = await authService.getCurrentUserId();
+
+      if (userId != null) {
+        ref.read(currentUserIdProvider.notifier).setUserId(userId);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage()),
+        );
+      }
     }
   }
 
@@ -51,16 +53,25 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _cargando = true);
 
     try {
-      final userLoggeado = await _authService.signIn(
+      // llamamos a riverpod para obtener el servicio de autenticacion
+      final authService = ref.read(authServiceProvider);
+
+      // Intentamos iniciar sesión
+      final userLoggeado = await authService.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
       if (userLoggeado && mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ProfilePage()),
-        );
+        final userId = ref.read(currentUserIdProvider);
+        if (userId != null) {
+          ref.read(currentUserIdProvider.notifier).setUserId(userId);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage()),
+          );
+        }
       }
     } catch (e) {
       _showError(e.toString());
@@ -74,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.redAccent,
       ),
     );
@@ -109,10 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 1.2,
                   ),
                 ),
-
                 const SizedBox(height: 40),
-
-                // Entrada de datos usando widget personalizado
                 _buildLabel("Correo electrónico"),
                 const SizedBox(height: 8),
                 CustomInputField(
@@ -121,9 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                   icon: Icons.email_outlined,
                   inputType: TextInputType.emailAddress,
                 ),
-
                 const SizedBox(height: 24),
-
                 _buildLabel("Contraseña"),
                 const SizedBox(height: 8),
                 CustomInputField(
@@ -132,17 +138,13 @@ class _LoginPageState extends State<LoginPage> {
                   icon: Icons.lock_outline,
                   isPassword: true,
                 ),
-
                 const SizedBox(height: 40),
-
                 PrimaryButton(
                   text: "Iniciar sesión",
                   isLoading: _cargando,
                   onPressed: _signIn,
                 ),
-
                 const SizedBox(height: 30),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

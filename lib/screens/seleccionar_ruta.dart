@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../services/google_maps.dart';
-import '../services/api_service.dart'; // Para conectarnos a FastAPI
-import '../services/auth_service.dart'; // Para sacar el ID del usuario
+import '/providers/app_providers.dart'; // Para usar Riverpod y acceder a los servicios desde el provider
 
-class RouteSelectionScreen extends StatefulWidget {
+class RouteSelectionScreen extends ConsumerStatefulWidget {
   final LatLng origin;
   final LatLng destination;
   final String originName;
@@ -19,12 +19,13 @@ class RouteSelectionScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _RouteSelectionScreenState createState() => _RouteSelectionScreenState();
+  ConsumerState<RouteSelectionScreen> createState() =>
+      _RouteSelectionScreenState();
 }
 
-class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
+class _RouteSelectionScreenState extends ConsumerState<RouteSelectionScreen> {
+  GoogleMapsService get mapService => ref.read(googleMapsServiceProvider);
   late GoogleMapController _mapController;
-  final GoogleMapsService _mapsService = GoogleMapsService();
 
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
@@ -32,6 +33,8 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   String _distance = "";
   String _duration = "";
   String _routeSummary = "";
+  String _encodedPolylineParaPostgis = "";
+  // String? _encodedPolylineParaPostgis;
   bool _isLoading = true;
 
   // JSON para pintar el mapa de Google en colores oscuros
@@ -76,7 +79,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   }
 
   Future<void> _fetchRoute() async {
-    final routeData = await _mapsService.getDirections(
+    final routeData = await mapService.getDirections(
       widget.origin,
       widget.destination,
     );
@@ -86,6 +89,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
         _distance = routeData['distance'];
         _duration = routeData['duration'];
         _routeSummary = routeData['summary'];
+        _encodedPolylineParaPostgis = routeData['encodedPolyline'];
 
         // Dibujamos la línea azul de la ruta
         _polylines.add(
@@ -100,27 +104,43 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
       });
 
       // Movemos la cámara para que Origen y Destino quepan en la pantalla
-      _mapController.animateCamera(
-        CameraUpdate.newLatLngBounds(
-          LatLngBounds(
-            southwest: LatLng(
-              widget.origin.latitude < widget.destination.latitude
-                  ? widget.origin.latitude
-                  : widget.destination.latitude,
-              widget.origin.longitude < widget.destination.longitude
-                  ? widget.origin.longitude
-                  : widget.destination.longitude,
+      if (_mapController != null) {
+        // Buena práctica asegurar que el controlador esté listo
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLngBounds(
+            LatLngBounds(
+              southwest: LatLng(
+                widget.origin.latitude < widget.destination.latitude
+                    ? widget.origin.latitude
+                    : widget.destination.latitude,
+                widget.origin.longitude < widget.destination.longitude
+                    ? widget.origin.longitude
+                    : widget.destination.longitude,
+              ),
+              northeast: LatLng(
+                widget.origin.latitude > widget.destination.latitude
+                    ? widget.origin.latitude
+                    : widget.destination.latitude,
+                widget.origin.longitude > widget.destination.longitude
+                    ? widget.origin.longitude
+                    : widget.destination.longitude,
+              ),
             ),
-            northeast: LatLng(
-              widget.origin.latitude > widget.destination.latitude
-                  ? widget.origin.latitude
-                  : widget.destination.latitude,
-              widget.origin.longitude > widget.destination.longitude
-                  ? widget.origin.longitude
-                  : widget.destination.longitude,
-            ),
+            100.0, // Espacio de margen (padding)
           ),
-          100.0, // Espacio de margen (padding)
+        );
+      }
+    } else {
+      // 🛡️ ESCUDO: Si mapService devuelve null, quitamos el loader y avisamos
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No se pudo calcular la ruta. Intenta mover los puntos.',
+          ),
+          backgroundColor: Colors.redAccent,
         ),
       );
     }
@@ -235,11 +255,12 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                         );
 
                         // Obtenemos el ID del usuario actual de Cognito
-                        final driverId = await AuthService().getCurrentUserId();
+                        final driverId = ref.read(currentUserIdProvider);
+                        final apiService = ref.read(apiServiceProvider);
 
                         if (driverId != null) {
                           // Mandamos toda la info al backend
-                          final exito = await ApiService().publicarViaje(
+                          final exito = await apiService.publicarViaje(
                             driverId: driverId,
                             originName: widget.originName,
                             originLat: widget.origin.latitude,
@@ -256,6 +277,8 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                                 10.0, // Precio fijo de ejemplo (puedes agregar lógica para
                             seatsAvailable:
                                 3, // Asientos disponibles de ejemplo
+                            encodedPolyline:
+                                _encodedPolylineParaPostgis, // Polilínea codificada para PostGIS
                           );
 
                           if (exito && mounted) {

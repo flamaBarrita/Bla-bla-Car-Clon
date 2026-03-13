@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_providers.dart';
 
-class PerfilPasagero extends StatefulWidget {
+class PerfilPasagero extends ConsumerStatefulWidget {
   final String passengerId;
   final String initialName;
   final String initialPhoto;
@@ -14,11 +15,10 @@ class PerfilPasagero extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _PerfilPasageroState createState() => _PerfilPasageroState();
+  ConsumerState<PerfilPasagero> createState() => _PerfilPasageroState();
 }
 
-class _PerfilPasageroState extends State<PerfilPasagero> {
-  final ApiService _apiService = ApiService();
+class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
   Map<String, dynamic>? _profileData;
   bool _isLoading = true;
 
@@ -29,8 +29,10 @@ class _PerfilPasageroState extends State<PerfilPasagero> {
   }
 
   Future<void> _fetchProfile() async {
-    // Usamos TU endpoint directamente
-    final data = await _apiService.obtenerPerfil(widget.passengerId);
+    final apiService = ref.read(apiServiceProvider);
+    final data = await apiService.obtenerPerfil(widget.passengerId);
+
+    // final data = ref.watch(userProfileProvider);
     if (mounted) {
       setState(() {
         _profileData = data;

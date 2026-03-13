@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 // Importa aquí todas tus pantallas
 import '../screens/home_page.dart';
 import '/screens/publicar_ruta.dart';
-import '../screens/buscar_ubicacion.dart';
 import '/screens/mensajes_screen.dart';
 import '/screens/buscar_viaje.dart';
+import '/screens/viajes_aprobados.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -29,7 +29,7 @@ class CustomBottomNavBar extends StatelessWidget {
         break;
       case 2:
         nextScreen =
-            ProfilePage(); // Cambiar luego por tu pantalla de "Tus Viajes"
+            MisViajesScreen(); // Cambiar luego por tu pantalla de "Tus Viajes"
         break;
       case 3:
         nextScreen =

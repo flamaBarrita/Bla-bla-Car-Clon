@@ -18,7 +18,7 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
   String? _destName;
   LatLng? _destCoords;
 
-  // Función para abrir la pantalla de buscar lugar
+  // Función para abrir la pantalla de buscar lugar usando bool para diferenciar origen de destino
   Future<void> _selectLocation(bool isOrigin) async {
     final result = await Navigator.push(
       context,
@@ -60,9 +60,9 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
       MaterialPageRoute(
         builder: (context) => TripResultsScreen(
           originName: _originName!,
-          originCoords: _originCoords!, // <-- Pasamos el LatLng del origen
+          originCoords: _originCoords!, // pasamos el LatLng del origen
           destName: _destName!,
-          destCoords: _destCoords!, // <-- Pasamos el LatLng del destino
+          destCoords: _destCoords!, // pasamos el LatLng del destino
         ),
       ),
     );
@@ -140,9 +140,8 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
                     title: Text(
                       _destName ?? 'Destino exacto',
                       style: TextStyle(
-                        color: _destName == null
-                            ? Colors.grey[500]
-                            : Colors.white,
+                        color:
+                            _destName == null ? Colors.grey[500] : Colors.white,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

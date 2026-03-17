@@ -12,14 +12,15 @@ class ApiService {
 
   final AuthService _authService = AuthService();
 
-  // Función auxiliar para armar las cabeceras con el candado
+  /// Función auxiliar que crea los encabezados seguros con el token de autenticación.
+  /// Devuelve los headers necesarios para hacer peticiones autenticadas al servidor.
   Future<Map<String, String>> _getSecureHeaders() async {
     final String? token = await _authService.getCognitoToken();
 
     if (token != null) {
       return {
         'Content-Type': 'application/json',
-        // ¡Aquí está la magia! Le pegamos el token al Header
+        // le pegamos el header al token
         'Authorization': 'Bearer $token',
       };
     } else {
@@ -28,24 +29,27 @@ class ApiService {
     }
   }
 
+  /// Obtiene los datos del perfil de un usuario específico.
+  /// Retorna un mapa con la información del perfil o null si hay error.
   Future<Map<String, dynamic>?> obtenerPerfil(String userId) async {
     try {
       final url = Uri.parse('$_baseUrl/profile/$userId');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders(); // añadimos seguridad
       final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        print("Error obteniendo perfil: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print("Error de red al obtener perfil: $e");
       return null;
     }
   }
 
+  /// Publica un nuevo viaje en la plataforma.
+  /// El conductor especifica origen, destino, horario, precio y plazas disponibles.
+  /// Retorna true si se publica correctamente, false si hay error.
   Future<bool> publicarViaje({
     required String driverId,
     required String originName,
@@ -63,7 +67,7 @@ class ApiService {
   }) async {
     try {
       final url = Uri.parse('$_baseUrl/trips/$driverId');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.post(
         url,
@@ -84,20 +88,17 @@ class ApiService {
         }),
       );
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        print(
-          "🔥 Error de FastAPI: Código ${response.statusCode} -> ${response.body}",
-        );
+      if (response.statusCode != 200 && response.statusCode != 201)
         return false;
-      }
 
       return true;
     } catch (e) {
-      print("Error de red publicando viaje: $e");
       return false;
     }
   }
 
+  /// Envía una solicitud para que un pasajero se una a un viaje existente.
+  /// Retorna un mapa indicando si la solicitud fue exitosa o con mensaje de error.
   Future<Map<String, dynamic>> solicitarUnirse({
     required int tripId,
     required String senderId,
@@ -109,7 +110,7 @@ class ApiService {
   }) async {
     try {
       final url = Uri.parse('$_baseUrl/trips/$tripId/requests');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.post(
         url,
@@ -134,31 +135,39 @@ class ApiService {
         };
       }
     } catch (e) {
-      print("Error enviando solicitud: $e");
       return {'success': false, 'message': 'Error de conexión'};
     }
   }
 
+  /// Registra un nuevo usuario en la base de datos al crear la cuenta.
+  /// Guarda el ID y nombre del usuario.
+  /// Retorna true si se crea correctamente, false si hay error.
   Future<bool> registrarUsuarioInicial({
     required String userId,
     required String name,
   }) async {
     try {
       final url = Uri.parse('$_baseUrl/users/$userId');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.post(
         url,
         headers: headers, // <-- USAMOS LOS HEADERS SEGUROS
         body: jsonEncode({"name": name}),
       );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(
+            'Fallo al crear usuario en la base de datos: ${response.statusCode}');
+      }
       return response.statusCode == 200;
     } catch (e) {
-      print("Error creando usuario en Postgres: $e");
       return false;
     }
   }
 
+  /// Actualiza la información del perfil del usuario (biografía, preferencias, vehículos).
+  /// Retorna true si se guarda correctamente, false si hay error.
   Future<bool> guardarPerfil({
     required String userId,
     required String biography,
@@ -167,7 +176,7 @@ class ApiService {
   }) async {
     try {
       final url = Uri.parse('$_baseUrl/profile/$userId');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.put(
         url,
@@ -182,19 +191,19 @@ class ApiService {
       if (response.statusCode == 200) {
         return true;
       } else {
-        print("Error del backend: ${response.body}");
         return false;
       }
     } catch (e) {
-      print("Error de red: $e");
       return false;
     }
   }
 
+  /// Obtiene el viaje activo/en curso de un conductor.
+  /// Retorna los datos del viaje o null si no hay viaje activo.
   Future<Map<String, dynamic>?> getActiveTrip(String driverId) async {
     try {
       final url = Uri.parse('$_baseUrl/trips/active/$driverId');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.get(url, headers: headers);
 
@@ -202,15 +211,17 @@ class ApiService {
         return jsonDecode(response.body);
       }
     } catch (e) {
-      print("Error obteniendo viaje activo: $e");
+      throw Exception('Error desconocido. Inténtalo de nuevo más tarde');
     }
     return null;
   }
 
+  /// Obtiene todas las solicitudes de pasajeros pendientes para un viaje específico.
+  /// Retorna una lista de solicitudes o lista vacía si hay error.
   Future<List<dynamic>> getTripRequests(int tripId) async {
     try {
       final url = Uri.parse('$_baseUrl/trips/$tripId/requests');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.get(url, headers: headers);
 
@@ -218,15 +229,18 @@ class ApiService {
         return jsonDecode(response.body);
       }
     } catch (e) {
-      print("Error obteniendo peticiones: $e");
+      throw Exception('Error desconocido. Inténtalo de nuevo más tarde');
     }
     return [];
   }
 
+  /// Responde a una solicitud de pasajero (aprobar o rechazar).
+  /// El status puede ser 'aceptado' o 'rechazado'
+  /// Retorna true si se actualiza correctamente, false si hay error.
   Future<bool> respondToRequest(int requestId, String status) async {
     try {
       final url = Uri.parse('$_baseUrl/requests/$requestId/status');
-      final headers = await _getSecureHeaders(); // <-- SEGURIDAD AÑADIDA
+      final headers = await _getSecureHeaders();
 
       final response = await http.put(
         url,
@@ -235,11 +249,13 @@ class ApiService {
       );
       return response.statusCode == 200;
     } catch (e) {
-      print("Error actualizando estado: $e");
       return false;
     }
   }
 
+  /// Busca todos los viajes disponibles según el origen y destino especificados.
+  /// Usa coordenadas (latitud/longitud) para encontrar rutas que coincidan.
+  /// Retorna una lista de viajes disponibles o lista vacía si hay error.
   Future<List<dynamic>> buscarViajes(
     double oLat,
     double oLng,
@@ -257,15 +273,16 @@ class ApiService {
         return jsonDecode(response.body);
       }
     } catch (e) {
-      print("Error buscando viajes: $e");
+      throw Exception('Error desconocido. Inténtalo de nuevo más tarde');
     }
     return [];
   }
 
+  /// Cancela un viaje publicado por el conductor.
+  /// Retorna true si se cancela correctamente, false si hay error.
   Future<bool> eliminarViaje(String viajeId) async {
     try {
-      final headers = await _getSecureHeaders(); // Tu función de los tokens
-      // Ajusta la URL según tu FastAPI
+      final headers = await _getSecureHeaders();
       final response = await http.patch(
         Uri.parse('$_baseUrl/trips/$viajeId/cancelar'),
         headers: headers,
@@ -273,63 +290,53 @@ class ApiService {
 
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
-      print("Error al eliminar viaje: $e");
       return false;
     }
   }
 
-  // --- ACTUALIZAR FCM TOKEN EN POSTGRES ---
+  /// Guarda el token FCM (Firebase Cloud Messaging) en la base de datos.
+  /// Este token se usa para enviar notificaciones push al usuario.
   Future<void> actualizarTokenNotificaciones(String token) async {
     try {
       final headers = await _getSecureHeaders();
 
       final body = jsonEncode({"fcm_token": token});
 
-      final response = await http.patch(
+      await http.patch(
         Uri.parse('$_baseUrl/api/users/update-fcm-token'),
         headers: headers,
         body: body,
       );
-
-      if (response.statusCode == 200) {
-        print("✅ FCM Token guardado exitosamente en la base de datos");
-      } else {
-        print("❌ Error al guardar FCM Token: ${response.body}");
-      }
     } catch (e) {
-      print("Error de red al enviar FCM Token: $e");
+      throw Exception(
+          'Error al actualizar el token. Inténtalo de nuevo más tarde');
     }
   }
 
-  // --- OBTENER LOS VIAJES APROBADOS DEL PASAJERO ---
+  /// Obtiene todos los viajes aprobados/confirmados de un pasajero.
+  /// Retorna una lista de viajes reservados o null si hay error.
   Future<List<dynamic>?> obtenerMisViajesAprobados(String passengerId) async {
     try {
-      // 1. Nos ponemos el gafete de seguridad (Token de Cognito)
       final headers = await _getSecureHeaders();
-
-      // 2. Viajamos a FastAPI usando la ruta exacta que creamos en Python
       final response = await http.get(
         Uri.parse('$_baseUrl/mis-viajes/aprobados/$passengerId'),
         headers: headers,
       );
 
-      // 3. Evaluamos lo que nos contestó el servidor
+      // Evaluamos lo que nos contestó el servidor
       if (response.statusCode == 200) {
-        // Traducimos el texto gigante (JSON) a una Lista que Flutter entienda
+        // Traducimos el texto JSON a una Lista que Flutter entienda
         return jsonDecode(response.body);
       } else {
-        print("Error en FastAPI: Código ${response.statusCode}");
-        // Si el servidor marca error, devolvemos null para que la app no explote
         return null;
       }
     } catch (e) {
-      // Atrapamos errores de internet (ej. si el usuario apagó el WiFi)
-      print("Error de conexión al obtener viajes aprobados: $e");
       return null;
     }
   }
 
-  // Cancela un asiento ya aprobado por parte del pasajero
+  /// Cancela un asiento reservado en un viaje (acción del pasajero).
+  /// Retorna true si se cancela correctamente, false si hay error.
   Future<bool> cancelarAsientoPasajero(
     String tripId,
     String passengerId,
@@ -344,7 +351,6 @@ class ApiService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print("Error al cancelar asiento: $e");
       return false;
     }
   }

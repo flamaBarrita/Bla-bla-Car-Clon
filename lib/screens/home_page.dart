@@ -5,7 +5,6 @@ import 'login/login.dart';
 import '../widgets/navegacion_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/providers/app_providers.dart';
-//import '../services/push_notifications.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -19,28 +18,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final TextEditingController _prefController = TextEditingController();
   final TextEditingController _vehiclesController = TextEditingController();
 
-  bool _cargando = true;
-  Map<String, dynamic>? _datosPerfil;
-
-  // Nuevos estados para controlar la vista
-  bool _isFetching =
-      true; // ¿Está trayendo datos de la BD al abrir la pantalla?
-  bool _isEditing = false; // ¿Están los campos de texto desbloqueados?
-  bool _isLoading = false; // ¿Está guardando los datos?
+  // Estados para controlar la vista
+  bool _isFetching = true; // Trayendo los datos de la bd
+  bool _isEditing = false; // Campos de texto desbloqueados al inicio
+  bool _isLoading = false; // Guardando los datos
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final apiService = ref.read(apiServiceProvider);
-      //PushNotificationService.inicializarYGuardarToken(apiService);
       _cargarPerfil(); // Cargamos el perfil apenas se abre la pantalla
     });
   }
+  // Creamod un alias del servicio de riverpod para usarlo directamente en todo el archivo
 
   ApiService get apiService => ref.read(apiServiceProvider);
   AuthService get authService => ref.read(authServiceProvider);
-  // --- 1. LÓGICA: TRAER DATOS (GET) ---
+
+  // Cargamos los datos del perfil del usuario
   Future<void> _cargarPerfil() async {
     final perfilCache = ref.read(userProfileProvider);
 
@@ -56,6 +51,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       }
       return; // Cortamos la ejecución aquí, ya no bajamos a hacer la petición.
     }
+    // ya que no tenemos caché guardado, hacemos una petición
+    // Obtenemos del id del usuario directamente del provider
     final String? miId = ref.read(currentUserIdProvider);
     if (miId != null) {
       final datos = await apiService.obtenerPerfil(miId);
@@ -76,7 +73,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (mounted) setState(() => _isFetching = false);
   }
 
-  // --- 2. LÓGICA: GUARDAR DATOS (PUT) ---
+  // Actualizar los datos del usuario
   Future<void> _guardarPerfil() async {
     setState(() => _isLoading = true);
 
@@ -103,12 +100,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         final perfilViejo = ref.read(userProfileProvider) ?? {};
         final perfilNuevo = {
           ...perfilViejo,
-          'biography': _bioController.text, // Tus nuevos datos
+          'biography':
+              _bioController.text, // añadimos la nueva información del usuario
           'preferences': _prefController.text,
           'vehicles': _vehiclesController.text,
         };
 
-        // 3. ¡Lo metemos de vuelta a la bóveda!
+        // Actualizamos los cambios a la bóveda de riverpod
         // Esto hace que cualquier pantalla que lo esté viendo se actualice sola.
         ref.read(userProfileProvider.notifier).setProfile(perfilNuevo);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -139,13 +137,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _signOut(BuildContext context) async {
     try {
+      // Hacemos logout usando cognito por medio del provider
       final authService = ref.read(authServiceProvider);
       await authService.signOut();
 
-      //limpiamos la boveda
+      //  Limpiamos la bóveda
       ref.invalidate(currentUserIdProvider);
       ref.invalidate(userProfileProvider);
       ref.invalidate(googleMapsServiceProvider);
+      // Regresamos a la página inicial
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => LoginPage()),
         (route) => false,
@@ -159,6 +159,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userData = ref.watch(userProfileProvider);
+    if (userData == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF191919),
+        body:
+            Center(child: CircularProgressIndicator(color: Color(0xFF00AFF5))),
+      );
+    }
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -219,7 +227,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                   ),
                   Text(
-                    "Principiante",
+                    "Nuevo usuario",
                     style: TextStyle(color: Colors.grey[400], fontSize: 16),
                   ),
                 ],
@@ -273,7 +281,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
           const SizedBox(height: 40),
 
-          // LÓGICA DEL BOTÓN CAMALEÓN
+          // Lógica del botón modificar información
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -317,6 +325,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
+  // Pestaña de configuración de la cuenta, donde se encuentra el botón de logout
   Widget _buildAccountTab() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -376,7 +385,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  // Actualizamos el widget para que acepte "enabled"
+  // Actualizamos el widget
   Widget _buildTextField(
     String label,
     String hint,

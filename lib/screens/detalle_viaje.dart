@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import 'perfil_pasagero.dart';
+import '/widgets/formatear_fecha.dart';
 
 class DetalleViajeScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> viaje;
@@ -16,7 +17,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
   bool _isCanceling = false;
 
   Future<void> _cancelarMiLugar() async {
-    // 1. Confirmación de seguridad
+    // Confirmación de seguridad
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -50,7 +51,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
 
     if (confirmar != true) return;
 
-    // 2. Ejecutar la cancelación
+    // Ejecutar la cancelación
     setState(() => _isCanceling = true);
     final apiService = ref.read(apiServiceProvider);
     final miId = ref.read(currentUserIdProvider);
@@ -91,6 +92,8 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
         widget.viaje['driver_photo'] ?? 'https://i.pravatar.cc/150?img=3';
     final fecha =
         widget.viaje['departure_time']?.toString() ?? 'Fecha por definir';
+    //con la función importada le damos formato a la fecha
+    final fecha_formateada = formatearFechaEstetica(fecha);
 
     return Scaffold(
       backgroundColor: const Color(0xFF191919),
@@ -105,7 +108,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- 1. ESTATUS Y PRECIO ---
+            // Mostramos el estatus del viaje y precio
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -138,7 +141,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
             ),
             const SizedBox(height: 24),
 
-            // --- 2. RUTA Y FECHA ---
+            // Mostramos la informacíón de la ruta y el precio
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -157,7 +160,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        fecha,
+                        fecha_formateada,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -216,7 +219,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
             ),
             const SizedBox(height: 24),
 
-            // --- 3. DATOS DEL CONDUCTOR Y AUTO ---
+            // Mostramos la información del conductor
             const Text(
               'Tu conductor',
               style: TextStyle(
@@ -276,7 +279,8 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  widget.viaje['car'] ?? 'Auto estándar',
+                                  widget.viaje['driver_vehicles'] ??
+                                      'Auto estándar',
                                   style: TextStyle(
                                     color: Colors.grey[400],
                                     fontSize: 14,
@@ -287,14 +291,6 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Placas: ${widget.viaje['plates'] ?? 'Por confirmar'}',
-                            style: const TextStyle(
-                              color: Color(0xFF00AFF5),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -305,7 +301,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
             ),
             const SizedBox(height: 32),
 
-            // --- 4. BOTONES DE ACCIÓN ---
+            // Botones de acción
             SizedBox(
               width: double.infinity,
               height: 56,

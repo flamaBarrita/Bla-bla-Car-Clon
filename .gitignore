@@ -49,3 +49,7 @@ app.*.map.json
 
 # Variables de entorno secretas
 .env
+
+/home/flama/Documents/blablacar/blablacar/lib/services/amplify_config.dart
+
+lib/services/amplify_config.dart

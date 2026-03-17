@@ -29,10 +29,10 @@ class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
   }
 
   Future<void> _fetchProfile() async {
+    // Llamamos a las providers
     final apiService = ref.read(apiServiceProvider);
     final data = await apiService.obtenerPerfil(widget.passengerId);
 
-    // final data = ref.watch(userProfileProvider);
     if (mounted) {
       setState(() {
         _profileData = data;
@@ -80,7 +80,7 @@ class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
                     ),
                     const SizedBox(height: 40),
 
-                    // INFORMACIÓN DEL BACKEND
+                    // Mostramos la data del backend
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Container(

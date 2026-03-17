@@ -24,32 +24,54 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage> {
   bool _isLoading = false;
 
   Future<void> _confirmar() async {
-    //utilizamos los providers para obtener las instancias de los servicios
     final authService = ref.read(authServiceProvider);
     final apiService = ref.read(apiServiceProvider);
     setState(() => _isLoading = true);
+
     try {
-      // Confirmamos el código con Cognito
+      // Confirmamos usando cognito
       await authService.confirmSignUp(
         email: widget.email,
         code: _codeController.text.trim(),
       );
 
-      // Logeamos automaticamente al usuario para obtener el ID
+      // iniciamos sesion por debajo
       await authService.signIn(widget.email, widget.password);
 
-      // Obtener el ID del usuario autenticado
       final userId = await authService.getCurrentUserId();
 
-      // Se triggera la creación del usuario en la db con el ID obtenido
-      if (userId != null) {
-        await apiService.registrarUsuarioInicial(
-          userId: userId,
-          name: widget.name,
+      if (userId == null) {
+        throw Exception(
+            "No se pudo obtener el ID de Cognito tras iniciar sesión.");
+      }
+
+      await apiService.registrarUsuarioInicial(
+        userId: userId,
+        name: widget.name,
+      );
+
+      //registramos a nuestro usuario en la db
+
+      //Refrescamos la memoria de Riverpod antes de navegar
+      ref.invalidate(userProfileProvider);
+
+      try {
+        final Map<String, dynamic>? userData =
+            await apiService.obtenerPerfil(userId);
+
+        if (userData != null) {
+          // Guardamos datos nuevos en la caché
+          ref.read(userProfileProvider.notifier).setProfile(userData);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error interno. Inténtalo de nuevo'),
+              backgroundColor: Colors.redAccent),
         );
       }
 
-      // si el user sigue en la pantalla, navegamos a la homepage
+      // Solo si llegamos hasta aquí sin errores, navegamos.
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -59,9 +81,14 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text('Error: Verifica tu código e intenta de nuevo.'),
+            backgroundColor: Colors.redAccent),
       );
-      setState(() => _isLoading = false);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-// Importa aquí todas tus pantallas
 import '../screens/home_page.dart';
 import '/screens/publicar_ruta.dart';
 import '/screens/mensajes_screen.dart';
@@ -11,7 +9,7 @@ class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
 
   const CustomBottomNavBar({Key? key, required this.currentIndex})
-    : super(key: key);
+      : super(key: key);
 
   void _onItemTapped(BuildContext context, int index) {
     if (index == currentIndex)
@@ -22,27 +20,25 @@ class CustomBottomNavBar extends StatelessWidget {
     // Asignamos la pantalla correspondiente a cada índice
     switch (index) {
       case 0:
-        nextScreen = SearchTripScreen(); // Suponiendo que tu Home es "Buscar"
+        nextScreen = SearchTripScreen(); // Pantalla de buscar viaje
         break;
       case 1:
-        nextScreen = const PublishRouteScreen(); // Tu nueva pantalla de mapas
+        nextScreen = const PublishRouteScreen(); // Pantalla de publicar viaje
         break;
       case 2:
-        nextScreen =
-            MisViajesScreen(); // Cambiar luego por tu pantalla de "Tus Viajes"
+        nextScreen = MisViajesScreen(); // Pantalla de mis viajes actuales
         break;
       case 3:
-        nextScreen =
-            const MessagesScreen(); // Cambiar luego por tu pantalla de "Mensajes"
+        nextScreen = const MessagesScreen(); // Pantalla de mensajes
         break;
       case 4:
-        nextScreen = ProfilePage(); // Tu pantalla de perfil
+        nextScreen = ProfilePage(); // Pantalla de perfil
         break;
       default:
         nextScreen = ProfilePage();
     }
 
-    // Navegación instantánea sin animaciones raras
+    // Navegación instantánea sin animaciones
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(

@@ -15,10 +15,13 @@ class MessagesScreen extends ConsumerStatefulWidget {
 
 class _MessagesScreenState extends ConsumerState<MessagesScreen> {
   bool _isLoading = true;
-  bool _isDeleting = false; // <-- Nuevo estado para el spinner de borrar
+  bool _isDeleting = false;
+  // Variable que guarda el viaje activo
   Map<String, dynamic>? _activeTrip;
+  //Variable que guarda los solicitudes
   List<dynamic> _solicitudes = [];
 
+  // Importamos los providers
   ApiService get apiService => ref.read(apiServiceProvider);
   AuthService get authService => ref.read(authServiceProvider);
 
@@ -30,22 +33,24 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
 
   Future<void> _loadRealData() async {
     setState(() => _isLoading = true);
-
+    // Obtenemos el id del provider y hacemos
     final String? driverId = ref.read(currentUserIdProvider);
     if (driverId != null) {
+      // Obtenemos el viaje activo de la db (si es que lo tiene)
       _activeTrip = await apiService.getActiveTrip(driverId);
 
       if (_activeTrip != null) {
+        // Si hay un viaje activo, obtenemos todas las peticiones relacionadas a dicho viaje
         _solicitudes = await apiService.getTripRequests(_activeTrip!['id']);
       }
     }
-
+    // Actualizamos la UI
     if (mounted) {
       setState(() => _isLoading = false);
     }
   }
 
-  // --- NUEVA LÓGICA: ELIMINAR VIAJE ---
+  // Eliminar viaje
   Future<void> _confirmarYEliminarViaje(String viajeId) async {
     final confirmar = await showDialog<bool>(
       context: context,
@@ -83,7 +88,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
     if (confirmar != true) return;
 
     if (mounted) setState(() => _isDeleting = true);
-
+    // Si el usuario acepta la cancelación del viaje, se hace la llamada al API
     final exito = await apiService.eliminarViaje(viajeId);
 
     if (mounted) {
@@ -116,6 +121,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
     }
   }
 
+  // Respuesta por parte del conductor
   Future<void> _responder(int index, String respuesta) async {
     final solicitud = _solicitudes[index];
     setState(() => solicitud['procesando'] = true);
@@ -127,6 +133,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
         _solicitudes.removeAt(index);
       });
       ScaffoldMessenger.of(context).showSnackBar(
+        // Mostramos el mensaje de acuerdo a la respuesta del conductor
         SnackBar(
           content: Text(
             respuesta == 'aceptado'
@@ -179,7 +186,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
+                  // Si no tiene viajes publicados, le mostramos esta UI
                   if (_activeTrip == null)
                     Container(
                       padding: const EdgeInsets.all(24),
@@ -195,6 +202,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                       ),
                     )
                   else
+                    // Mostramos la información de su viaje
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -218,7 +226,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                 ),
                               ),
 
-                              // --- NUEVA SECCIÓN DE ETIQUETA Y BOTÓN DE BORRAR ---
+                              // Mostramos que el viaje esta publicado y el botón de eliminar viaje
                               Row(
                                 children: [
                                   Container(
@@ -260,14 +268,15 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                           padding: EdgeInsets.zero,
                                           onPressed: () =>
                                               _confirmarYEliminarViaje(
-                                                _activeTrip!['id'].toString(),
-                                              ),
+                                            _activeTrip!['id'].toString(),
+                                          ),
                                         ),
                                 ],
                               ),
                             ],
                           ),
                           const Divider(color: Colors.grey, height: 24),
+                          // Mostramos la ruta de origen del viaje
                           Row(
                             children: [
                               const Icon(
@@ -297,6 +306,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                               color: Colors.grey[700],
                             ),
                           ),
+                          // Mostramos la ruta de destino del viaje
                           Row(
                             children: [
                               const Icon(
@@ -320,7 +330,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                         ],
                       ),
                     ),
-
                   const SizedBox(height: 32),
                   const Text(
                     'Peticiones de ingreso',
@@ -331,15 +340,13 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
+                  // Mostramos las peticiones de ingreso para el viaje
                   if (_solicitudes.isEmpty)
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
-
                         child: Text(
                           'No tienes solicitudes pendientes.',
-
                           style: TextStyle(color: Colors.grey[500]),
                         ),
                       ),
@@ -347,28 +354,20 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                   else
                     ListView.builder(
                       shrinkWrap: true,
-
                       physics: const NeverScrollableScrollPhysics(),
-
                       itemCount: _solicitudes.length,
-
                       itemBuilder: (context, index) {
                         final solicitud = _solicitudes[index];
-
                         final bool procesando =
                             solicitud['procesando'] ?? false;
-
-                        // --- EXTRACCIÓN SEGURA DE DATOS ---
-
-                        // Si el backend no manda la variable o viene nula, ponemos un default para que Flutter no explote
-
+                        // Extracción segura de la info del pasagero si nos devuelve null
                         final String pName =
                             solicitud['passenger_name']?.toString() ??
-                            'Usuario desconocido';
+                                'Usuario desconocido';
 
                         final String pPhoto =
                             solicitud['passenger_photo']?.toString() ??
-                            'https://i.pravatar.cc/150?img=3';
+                                'https://i.pravatar.cc/150?img=3';
 
                         final String pRating =
                             solicitud['passenger_rating']?.toString() ?? '5.0';
@@ -391,88 +390,64 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                 Expanded(
                                   child: GestureDetector(
                                     behavior: HitTestBehavior.opaque,
-
                                     onTap: () {
                                       if (pId.isNotEmpty) {
                                         Navigator.push(
                                           context,
-
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 PerfilPasagero(
-                                                  passengerId: pId,
-
-                                                  initialName: pName,
-
-                                                  initialPhoto: pPhoto,
-                                                ),
+                                              passengerId: pId,
+                                              initialName: pName,
+                                              initialPhoto: pPhoto,
+                                            ),
                                           ),
                                         );
                                       }
                                     },
-
                                     child: Row(
                                       children: [
                                         Hero(
                                           tag: 'avatar_$pId',
-
                                           child: CircleAvatar(
                                             radius: 24,
-
                                             backgroundImage: NetworkImage(
                                               pPhoto,
                                             ),
                                           ),
                                         ),
-
                                         const SizedBox(width: 12),
-
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
-
                                             children: [
                                               Text(
                                                 pName,
-
                                                 style: const TextStyle(
                                                   color: Colors.white,
-
                                                   fontWeight: FontWeight.bold,
-
                                                   fontSize: 16,
                                                 ),
-
                                                 maxLines: 1,
-
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-
                                               const SizedBox(height: 4),
-
                                               Row(
                                                 children: [
                                                   const Icon(
                                                     Icons.star,
-
                                                     color: Colors.amber,
-
                                                     size: 14,
                                                   ),
-
                                                   const SizedBox(width: 4),
-
                                                   Text(
                                                     pRating,
-
                                                     style: TextStyle(
                                                       color: Colors.grey[400],
-
                                                       fontSize: 12,
                                                     ),
                                                   ),
-
                                                   const SizedBox(width: 8),
                                                   const Icon(
                                                     Icons.person,
@@ -509,6 +484,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                     ),
                                   )
                                 else ...[
+                                  // Monstramos el status de la petición
                                   IconButton(
                                     icon: const Icon(
                                       Icons.close,

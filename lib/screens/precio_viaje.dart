@@ -96,144 +96,157 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
         elevation: 0,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Detalles finales",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              "Fija tu aportación por asiento y cuántos pasajeros puedes llevar.",
-              style: TextStyle(color: Colors.grey[400], fontSize: 16),
-            ),
-            const SizedBox(height: 40),
-
-            // Guardamos el costo del viaje del conductor
-            const Text("Aportación por persona",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2C2C2C),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("\$",
+            // El contenido scrolleable envuelto en Expanded + SingleChildScrollView
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Detalles finales",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 120,
-                    child: TextField(
-                      controller: _priceController,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(
-                          color: Color(0xFF00AFF5),
-                          fontSize: 48,
+                          fontSize: 32,
                           fontWeight: FontWeight.bold),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "0",
-                        hintStyle: TextStyle(color: Colors.grey),
-                      ),
-                      onChanged: (val) => setState(() {}),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Fija tu aportación por asiento y cuántos pasajeros puedes llevar.",
+                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                    ),
+                    const SizedBox(height: 40),
 
-            // Guardamos la cantidad de asientos disponibles
-            const Text("Asientos disponibles",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2C2C2C),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Botón Menos
-                  IconButton(
-                    onPressed: _asientos > 1
-                        ? () => setState(() => _asientos--)
-                        : null,
-                    icon: Icon(Icons.remove_circle_outline,
-                        color: _asientos > 1
-                            ? const Color(0xFF00AFF5)
-                            : Colors.grey,
-                        size: 32),
-                  ),
-
-                  // Número central
-                  Text(
-                    "$_asientos",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold),
-                  ),
-
-                  // Botón Más
-                  IconButton(
-                    onPressed: _asientos < 6
-                        ? () => setState(() => _asientos++)
-                        : null,
-                    icon: Icon(Icons.add_circle_outline,
-                        color: _asientos < 6
-                            ? const Color(0xFF00AFF5)
-                            : Colors.grey,
-                        size: 32),
-                  ),
-                ],
-              ),
-            ),
-
-            const Spacer(),
-
-            // Boton final para publicar el viaje
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: (_priceController.text.isNotEmpty && !_isPublishing)
-                    ? _publicarViaje
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00AFF5),
-                  disabledBackgroundColor: Colors.grey[800],
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28)),
-                ),
-                child: _isPublishing
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Publicar viaje",
+                    // Guardamos el costo del viaje del conductor
+                    const Text("Aportación por persona",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2C2C2C),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("\$",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                            width: 120,
+                            child: TextField(
+                              controller: _priceController,
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(
+                                  color: Color(0xFF00AFF5),
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.bold),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "0",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                              onChanged: (val) => setState(() {}),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Guardamos la cantidad de asientos disponibles
+                    const Text("Asientos disponibles",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2C2C2C),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Botón Menos
+                          IconButton(
+                            onPressed: _asientos > 1
+                                ? () => setState(() => _asientos--)
+                                : null,
+                            icon: Icon(Icons.remove_circle_outline,
+                                color: _asientos > 1
+                                    ? const Color(0xFF00AFF5)
+                                    : Colors.grey,
+                                size: 32),
+                          ),
+
+                          // Número central
+                          Text(
+                            "$_asientos",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold),
+                          ),
+
+                          // Botón Más
+                          IconButton(
+                            onPressed: _asientos < 6
+                                ? () => setState(() => _asientos++)
+                                : null,
+                            icon: Icon(Icons.add_circle_outline,
+                                color: _asientos < 6
+                                    ? const Color(0xFF00AFF5)
+                                    : Colors.grey,
+                                size: 32),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // El botón final se queda fuera del Scroll, anclado al fondo
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 24.0, right: 24.0, bottom: 24.0, top: 8.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed:
+                      (_priceController.text.isNotEmpty && !_isPublishing)
+                          ? _publicarViaje
+                          : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00AFF5),
+                    disabledBackgroundColor: Colors.grey[800],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28)),
+                  ),
+                  child: _isPublishing
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("Publicar viaje",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
+                ),
               ),
             ),
           ],

@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   // Patrón Singleton
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
   ApiService._internal();
-
-  final String _baseUrl = 'http://140.84.167.187:8000';
+  final String _baseUrl = dotenv.env['IP_SERVER'] ?? 'localhost';
 
   final AuthService _authService = AuthService();
 
@@ -33,6 +33,7 @@ class ApiService {
   /// Retorna un mapa con la información del perfil o null si hay error.
   Future<Map<String, dynamic>?> obtenerPerfil(String userId) async {
     try {
+      print(_baseUrl);
       final url = Uri.parse('$_baseUrl/profile/$userId');
       final headers = await _getSecureHeaders(); // añadimos seguridad
       final response = await http.get(url, headers: headers);

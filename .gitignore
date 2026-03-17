@@ -49,3 +49,9 @@ app.*.map.json
 
 # Variables de entorno secretas
 .env
+
+/home/flama/Documents/blablacar/blablacar/firebase.json
+firebase.json
+
+/home/flama/Documents/blablacar/blablacar/lib/firebase_options.dart
+lib/firebase_options.dart

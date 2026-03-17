@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'perfil_pasagero.dart';
 import '/providers/app_providers.dart';
 import 'home_page.dart';
-// IMPORTA AQUÍ LA PANTALLA A LA QUE QUIERES IR DESPUÉS
-// import 'pantalla_x.dart';
+import '/widgets/formatear_fecha.dart';
 
-// 1. Lo convertimos a ConsumerStatefulWidget para manejar el estado del botón
 class TripCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> viaje;
 
@@ -17,12 +15,12 @@ class TripCard extends ConsumerStatefulWidget {
 }
 
 class _TripCardState extends ConsumerState<TripCard> {
-  // 2. Variable para controlar la animación del botón
+  // Variable para controlar la animación del botón
   bool _isRequesting = false;
 
   @override
   Widget build(BuildContext context) {
-    // Como ahora es Stateful, accedemos al mapa usando "widget.viaje"
+    // Obtenemos la información enviada por la pantalla anterior
     final String fechaStr =
         widget.viaje['departure_time']?.toString() ?? 'Pronto';
     final String driverPhoto =
@@ -36,12 +34,12 @@ class _TripCardState extends ConsumerState<TripCard> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 1. Encabezado: Fecha y Precio
+            // Encabezado de Fecha y Precio
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  fechaStr,
+                  formatearFechaEstetica(fechaStr),
                   style: const TextStyle(
                     color: Color(0xFF00AFF5),
                     fontWeight: FontWeight.bold,
@@ -60,7 +58,7 @@ class _TripCardState extends ConsumerState<TripCard> {
             ),
             const Divider(color: Colors.grey, height: 24),
 
-            // 2. Zona del Conductor (Tocar para ver perfil)
+            // Zona de información del conductor, click para entrar al perfil
             InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: () {
@@ -142,7 +140,7 @@ class _TripCardState extends ConsumerState<TripCard> {
 
             const SizedBox(height: 16),
 
-            // 3. Botón de Solicitar Unirse Animado
+            // Botón de solicitar unirse
             SizedBox(
               width: double.infinity,
               height:
@@ -156,9 +154,8 @@ class _TripCardState extends ConsumerState<TripCard> {
                   ),
                 ),
                 // Si ya está cargando, bloqueamos el botón mandando "null" para evitar doble tap
-                onPressed: _isRequesting
-                    ? null
-                    : () => _enviarSolicitud(context),
+                onPressed:
+                    _isRequesting ? null : () => _enviarSolicitud(context),
 
                 // Mostramos el spinner o el texto dependiendo del estado
                 child: _isRequesting
@@ -185,11 +182,11 @@ class _TripCardState extends ConsumerState<TripCard> {
     );
   }
 
-  // --- LÓGICA DE SOLICITUD OPTIMIZADA ---
+  // Enviamos solicitud
   Future<void> _enviarSolicitud(BuildContext context) async {
-    // 1. Encendemos la animación del botón
+    // Encendemos la animación del botón
     setState(() => _isRequesting = true);
-
+    // Cargamos los providers
     final apiService = ref.read(apiServiceProvider);
     final String? miId = ref.read(currentUserIdProvider);
 
@@ -208,7 +205,7 @@ class _TripCardState extends ConsumerState<TripCard> {
       return;
     }
 
-    // 2. Mandamos la petición a FastAPI
+    // Mandamos la petición al backend
     final resultado = await apiService.solicitarUnirse(
       tripId: widget.viaje['id'],
       passengerId: miId,
@@ -222,9 +219,9 @@ class _TripCardState extends ConsumerState<TripCard> {
 
     if (!mounted) return;
 
-    // 3. Evaluamos la respuesta de FastAPI
+    // Evaluamos la respuesta del back
     if (resultado['success'] == true) {
-      // Apagamos el spinner (opcional, ya que cambiaremos de pantalla)
+      // Apagamos el spinner ya que cambiaremos de pantalla
       setState(() => _isRequesting = false);
 
       ScaffoldMessenger.of(context).showSnackBar(

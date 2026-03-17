@@ -15,7 +15,6 @@ class AuthService {
       final session = await Amplify.Auth.fetchAuthSession();
       return session.isSignedIn;
     } catch (e) {
-      print("Error revisando sesión: $e");
       return false;
     }
   }
@@ -26,7 +25,6 @@ class AuthService {
       final user = await Amplify.Auth.getCurrentUser();
       return user.userId;
     } catch (e) {
-      print("Error obteniendo el ID del usuario: $e");
       return null;
     }
   }
@@ -36,7 +34,8 @@ class AuthService {
     try {
       await Amplify.Auth.signOut();
     } catch (e) {
-      print("Error saliendo: $e");
+      throw Exception(
+          'Error al salir de la sesión. Inténtalo de nuevo más tarde');
     }
   }
 
@@ -76,7 +75,6 @@ class AuthService {
       return result.isSignUpComplete ||
           result.nextStep.signUpStep == AuthSignUpStep.confirmSignUp;
     } catch (e) {
-      print("Error en registro: $e");
       rethrow; // Lanzamos el error para que la UI lo atrape y muestre la barra roja
     }
   }
@@ -93,23 +91,22 @@ class AuthService {
       );
       return result.isSignUpComplete;
     } catch (e) {
-      print("Error confirmando registro: $e");
       rethrow;
     }
   }
 
-  /// Obtiene el token JWT actual de Cognito para enviarlo a FastAPI
+  /// Obtiene el token JWT actual de Cognito para enviarlo al back
   Future<String?> getCognitoToken() async {
     try {
-      // 1. Obtenemos el plugin específico de Cognito (La forma moderna recomendada por AWS)
+      // Obtenemos el plugin específico de Cognito
       final cognitoPlugin = Amplify.Auth.getPlugin(
         AmplifyAuthCognito.pluginKey,
       );
 
-      // 2. Pedimos la sesión directamente al plugin
+      // Pedimos la sesión directamente al plugin
       final session = await cognitoPlugin.fetchAuthSession();
 
-      // 3. Verificamos si el usuario tiene la sesión iniciada
+      // Verificamos si el usuario tiene la sesión iniciada
       if (session.isSignedIn) {
         // Extraemos los tokens de forma segura
         final tokens = session.userPoolTokensResult.value;
@@ -120,10 +117,8 @@ class AuthService {
 
       return null; // No hay sesión activa
     } on SignedOutException {
-      print("El usuario no ha iniciado sesión.");
       return null;
     } catch (e) {
-      print("🔥 Error obteniendo el token de Cognito: $e");
       return null;
     }
   }

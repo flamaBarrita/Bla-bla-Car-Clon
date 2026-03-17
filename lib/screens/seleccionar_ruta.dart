@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../services/google_maps.dart';
 import '/providers/app_providers.dart'; // Para usar Riverpod y acceder a los servicios desde el provider
+import 'fecha_hora_viaje.dart';
 
 class RouteSelectionScreen extends ConsumerStatefulWidget {
   final LatLng origin;
@@ -146,6 +147,29 @@ class _RouteSelectionScreenState extends ConsumerState<RouteSelectionScreen> {
     }
   }
 
+  void _continuarHaciaFechaYHora() {
+    // 1. Armamos nuestro "paquete" con todo lo que llevamos del viaje
+    final Map<String, dynamic> tripData = {
+      'originName': widget.originName,
+      'originLat': widget.origin.latitude,
+      'originLng': widget.origin.longitude,
+      'destName': widget.destName,
+      'destLat': widget.destination.latitude,
+      'destLng': widget.destination.longitude,
+      'distanceText': _distance,
+      'durationText': _duration,
+      'encodedPolyline': _encodedPolylineParaPostgis,
+    };
+
+    // 2. Pasamos la estafeta a la pantalla de Fecha y Hora
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectDateTimeScreen(tripData: tripData),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -242,66 +266,16 @@ class _RouteSelectionScreenState extends ConsumerState<RouteSelectionScreen> {
                   const SizedBox(height: 20),
 
                   // BOTÓN PARA GUARDAR EL VIAJE EN LA BASE DE DATOS
+                  // BOTÓN PARA CONTINUAR A LA PANTALLA DE FECHA Y HORA
                   Align(
                     alignment: Alignment.centerRight,
                     child: FloatingActionButton(
                       backgroundColor: const Color(0xFF00AFF5),
-                      onPressed: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Publicando ruta...'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-
-                        // Obtenemos el ID del usuario actual de Cognito
-                        final driverId = ref.read(currentUserIdProvider);
-                        final apiService = ref.read(apiServiceProvider);
-
-                        if (driverId != null) {
-                          // Mandamos toda la info al backend
-                          final exito = await apiService.publicarViaje(
-                            driverId: driverId,
-                            originName: widget.originName,
-                            originLat: widget.origin.latitude,
-                            originLng: widget.origin.longitude,
-                            destName: widget.destName,
-                            destLat: widget.destination.latitude,
-                            destLng: widget.destination.longitude,
-                            distanceText: _distance,
-                            durationText: _duration,
-                            departureTime: DateTime.now()
-                                .add(const Duration(minutes: 15))
-                                .toIso8601String(), // Ejemplo: salida en 15 minutos
-                            price:
-                                10.0, // Precio fijo de ejemplo (puedes agregar lógica para
-                            seatsAvailable:
-                                3, // Asientos disponibles de ejemplo
-                            encodedPolyline:
-                                _encodedPolylineParaPostgis, // Polilínea codificada para PostGIS
-                          );
-
-                          if (exito && mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('¡Viaje publicado con éxito!'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                            Navigator.pop(
-                              context,
-                            ); // Cierra el mapa y vuelve a la app
-                          } else if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Error al guardar la ruta'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      child: const Icon(Icons.check, color: Colors.white),
+                      onPressed:
+                          _continuarHaciaFechaYHora, // ⚡ Solo llamamos a la función
+                      // Cambié el ícono a una flecha, ya que aún no es el paso final
+                      child:
+                          const Icon(Icons.arrow_forward, color: Colors.white),
                     ),
                   ),
                 ],

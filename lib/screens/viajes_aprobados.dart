@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import '/widgets/navegacion_button.dart';
-import '/screens/detalle_viaje.dart'; // La pantalla a la que iremos después
+import '/screens/detalle_viaje.dart';
+import '/widgets/formatear_fecha.dart';
 
 class MisViajesScreen extends ConsumerStatefulWidget {
   const MisViajesScreen({Key? key}) : super(key: key);
@@ -23,12 +24,12 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
 
   Future<void> _cargarMisViajes() async {
     setState(() => _isLoading = true);
-
+    // Instanciamos a los providers
     final apiService = ref.read(apiServiceProvider);
     final miId = ref.read(currentUserIdProvider);
 
     if (miId != null) {
-      // Llamamos a la nueva función de tu ApiService
+      // Llamamos a la nueva función del API por medio del provider
       final viajes = await apiService.obtenerMisViajesAprobados(miId);
       if (mounted) {
         setState(() {
@@ -59,27 +60,26 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
               child: CircularProgressIndicator(color: Color(0xFF00AFF5)),
             )
           : _misViajes.isEmpty
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              // Permite al usuario deslizar hacia abajo para recargar
-              color: const Color(0xFF00AFF5),
-              backgroundColor: const Color(0xFF2C2C2C),
-              onRefresh: _cargarMisViajes,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: _misViajes.length,
-                itemBuilder: (context, index) {
-                  final viaje = _misViajes[index];
-                  return _buildViajeCard(viaje);
-                },
-              ),
-            ),
-      // Ajusta el currentIndex según la posición de esta pantalla en tu menú
+              ? _buildEmptyState()
+              : RefreshIndicator(
+                  // Permite al usuario deslizar hacia abajo para recargar
+                  color: const Color(0xFF00AFF5),
+                  backgroundColor: const Color(0xFF2C2C2C),
+                  onRefresh: _cargarMisViajes,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: _misViajes.length,
+                    itemBuilder: (context, index) {
+                      final viaje = _misViajes[index];
+                      return _buildViajeCard(viaje);
+                    },
+                  ),
+                ),
       bottomNavigationBar: const CustomBottomNavBar(currentIndex: 2),
     );
   }
 
-  // --- WIDGET: ESTADO VACÍO ---
+  // Widget en estado vacío
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -109,10 +109,12 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
     );
   }
 
-  // --- WIDGET: TARJETA DEL VIAJE APROBADO ---
+  // Widget viaje aprobado
   Widget _buildViajeCard(Map<String, dynamic> viaje) {
     // Si la fecha viene nula, ponemos un default.
     final fecha = viaje['departure_time']?.toString() ?? 'Fecha por definir';
+
+    final fecha_formateda = formatearFechaEstetica(fecha);
 
     return Card(
       color: const Color(0xFF2C2C2C),
@@ -134,9 +136,9 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
             ),
           );
 
-          // 3. Si atrapamos un true, disparamos la recarga de tu lista automáticamente
+          // Si hubo algún cambio(eliminación), disparamos la recarga de la lista automáticamente
           if (huboCambios == true) {
-            _cargarMisViajes(); // ¡Tu función vuelve a ir a FastAPI y limpia la pantalla!
+            _cargarMisViajes(); // Función vuelve a ir al back y limpia la pantalla
           }
         },
         child: Padding(
@@ -173,7 +175,7 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
                     ),
                   ),
                   Text(
-                    fecha,
+                    fecha_formateda,
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],

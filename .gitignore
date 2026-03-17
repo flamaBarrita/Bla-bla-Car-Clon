@@ -55,3 +55,6 @@ firebase.json
 
 /home/flama/Documents/blablacar/blablacar/lib/firebase_options.dart
 lib/firebase_options.dart
+/home/flama/Documents/blablacar/blablacar/lib/services/amplify_config.dart
+
+lib/services/amplify_config.dart

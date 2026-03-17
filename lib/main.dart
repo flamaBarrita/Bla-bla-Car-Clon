@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       }
       setState(() => _AmplifyConfigurado = true);
     } catch (e) {
-      print('Error configurando Amplify: $e');
+      rethrow;
     }
   }
 
@@ -50,12 +50,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Bla Bla Car',
-      // Mantenemos el tema oscuro global
+      title: 'Dame Ride!',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF191919),
         primaryColor: const Color(0xFF00AFF5),
       ),
+      // Nuestra primera acción es mandarlo a nuestro servicio de Auth y si esta autorizado puede entrar a la aplicación
       home: _AmplifyConfigurado
           ? Auth()
           : const Scaffold(body: Center(child: CircularProgressIndicator())),

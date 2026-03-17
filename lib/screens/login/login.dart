@@ -5,6 +5,7 @@ import '../home_page.dart';
 import '/widgets/boton_principal.dart';
 import '/widgets/entrada_datos.dart';
 import 'signup_page.dart';
+import '/services/api_service.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   @override
@@ -40,6 +41,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
       if (userId != null) {
         ref.read(currentUserIdProvider.notifier).setUserId(userId);
+        try {
+          final apiService = ref.read(apiServiceProvider);
+          final userData = await apiService.obtenerPerfil(userId);
+          if (userData != null) {
+            ref.read(userProfileProvider.notifier).setProfile(userData);
+          }
+        } catch (e) {
+          rethrow;
+        }
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -55,21 +65,33 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     try {
       // llamamos a riverpod para obtener el servicio de autenticacion
       final authService = ref.read(authServiceProvider);
+      final apiService = ref.read(apiServiceProvider);
 
       // Intentamos iniciar sesión
-      final userLoggeado = await authService.signIn(
+      await authService.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
-      if (userLoggeado && mounted) {
-        final userId = ref.read(currentUserIdProvider);
-        if (userId != null) {
-          ref.read(currentUserIdProvider.notifier).setUserId(userId);
+      final userId = await authService.getCurrentUserId();
 
-          Navigator.pushReplacement(
+      if (userId != null && mounted) {
+        ref.read(currentUserIdProvider.notifier).setUserId(userId);
+
+        try {
+          final userData = await apiService.obtenerPerfil(userId);
+          if (userData != null) {
+            ref.read(userProfileProvider.notifier).setProfile(userData);
+          }
+        } catch (e) {
+          rethrow;
+        }
+
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => ProfilePage()),
+            (route) => false,
           );
         }
       }
@@ -100,7 +122,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Color(0xFF00AFF5), size: 28),
-          onPressed: () => print("Cerrar"),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(

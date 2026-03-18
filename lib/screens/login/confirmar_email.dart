@@ -44,13 +44,12 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage> {
         throw Exception(
             "No se pudo obtener el ID de Cognito tras iniciar sesión.");
       }
+      //registramos a nuestro usuario en la db
 
       await apiService.registrarUsuarioInicial(
         userId: userId,
         name: widget.name,
       );
-
-      //registramos a nuestro usuario en la db
 
       //Refrescamos la memoria de Riverpod antes de navegar
       ref.invalidate(userProfileProvider);
@@ -62,6 +61,8 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage> {
         if (userData != null) {
           // Guardamos datos nuevos en la caché
           ref.read(userProfileProvider.notifier).setProfile(userData);
+          // Seteamos el ID en riverpod
+          ref.read(currentUserIdProvider.notifier).setUserId(userId);
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

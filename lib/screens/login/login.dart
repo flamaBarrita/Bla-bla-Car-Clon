@@ -5,7 +5,6 @@ import '../home_page.dart';
 import '/widgets/boton_principal.dart';
 import '/widgets/entrada_datos.dart';
 import 'signup_page.dart';
-import '/services/api_service.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   @override
@@ -126,49 +125,50 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Text(
-                  "Inicia sesión con tu\ne-mail",
-                  style: TextStyle(
-                    color: _textColor,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Inicia sesión con tu\ne-mail",
+                style: TextStyle(
+                  color: _textColor,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
                 ),
-                const SizedBox(height: 40),
-                _buildLabel("Correo electrónico"),
-                const SizedBox(height: 8),
-                CustomInputField(
-                  controller: _emailController,
-                  hint: "ejemplo@correo.com",
-                  icon: Icons.email_outlined,
-                  inputType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 24),
-                _buildLabel("Contraseña"),
-                const SizedBox(height: 8),
-                CustomInputField(
-                  controller: _passwordController,
-                  hint: "Introduce tu contraseña",
-                  icon: Icons.lock_outline,
-                  isPassword: true,
-                ),
-                const SizedBox(height: 40),
-                PrimaryButton(
-                  text: "Iniciar sesión",
-                  isLoading: _cargando,
-                  onPressed: _signIn,
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              const SizedBox(height: 40),
+              _buildLabel("Correo electrónico"),
+              const SizedBox(height: 8),
+              CustomInputField(
+                controller: _emailController,
+                hint: "ejemplo@correo.com",
+                icon: Icons.email_outlined,
+                inputType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 24),
+              _buildLabel("Contraseña"),
+              const SizedBox(height: 8),
+              CustomInputField(
+                controller: _passwordController,
+                hint: "Introduce tu contraseña",
+                icon: Icons.lock_outline,
+                isPassword: true,
+              ),
+              const SizedBox(height: 40),
+              PrimaryButton(
+                text: "Iniciar sesión",
+                isLoading: _cargando,
+                onPressed: _signIn,
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
                       "¿Todavía no tienes una cuenta? ",
@@ -192,8 +192,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

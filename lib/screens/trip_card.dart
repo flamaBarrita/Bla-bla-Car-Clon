@@ -188,7 +188,7 @@ class _TripCardState extends ConsumerState<TripCard> {
     setState(() => _isRequesting = true);
     // Cargamos los providers
     final apiService = ref.read(apiServiceProvider);
-    final String? miId = ref.read(currentUserIdProvider);
+    final String? miId = ref.watch(currentUserIdProvider);
 
     final miPerfil = ref.read(userProfileProvider);
 

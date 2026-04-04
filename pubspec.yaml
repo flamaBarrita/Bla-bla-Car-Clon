@@ -9,7 +9,8 @@ environment:
 dependencies:
   amplify_auth_cognito: ^2.10.0
   amplify_flutter: ^2.10.0
-  firebase_core: ^4.5.0
+  cloud_firestore: ^6.2.0
+  firebase_core: ^4.6.0
   firebase_messaging: ^16.1.2
   flutter:
     sdk: flutter

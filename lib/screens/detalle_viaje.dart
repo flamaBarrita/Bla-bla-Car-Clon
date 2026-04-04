@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import 'perfil_pasagero.dart';
 import '/widgets/formatear_fecha.dart';
+import '/screens/chat.dart';
 
 class DetalleViajeScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> viaje;
@@ -307,10 +308,12 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
               height: 56,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Aquí conectaremos la funcionalidad del CHAT en el futuro
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Abriendo chat con el conductor...'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatPage(
+                        viajeId: widget.viaje['id'].toString(),
+                      ),
                     ),
                   );
                 },

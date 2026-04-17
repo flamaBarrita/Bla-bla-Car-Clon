@@ -6,6 +6,7 @@ import '/widgets/boton_principal.dart';
 import '/widgets/entrada_datos.dart';
 import 'signup_page.dart';
 import '/services/api_service.dart';
+import '/themes/app_theme.dart'; // Importamos la nueva paleta de colores institucionales
 
 class LoginPage extends ConsumerStatefulWidget {
   @override
@@ -18,9 +19,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _cargando = false;
-
-  final Color _backgroundColor = const Color(0xFF191919);
-  final Color _textColor = Colors.white;
 
   @override
   void initState() {
@@ -107,8 +105,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.white)),
-        backgroundColor: Colors.redAccent,
+        content: Text(
+          message,
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: Colors
+            .red.shade400, // Un rojo más suave y profesional para el modo claro
+        behavior: SnackBarBehavior
+            .floating, // Hace que el snackbar flote, viéndose más moderno
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -116,12 +122,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      // Fondo blanco institucional
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Color(0xFF00AFF5), size: 28),
+          // Cambiamos el ícono azul por el naranja institucional
+          icon:
+              Icon(Icons.close, color: AnahuacColors.PRIMARY_ORANGE, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -136,7 +145,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Text(
                   "Inicia sesión con tu\ne-mail",
                   style: TextStyle(
-                    color: _textColor,
+                    color: AnahuacColors
+                        .TEXT_DARK, // Gris oscuro para máxima legibilidad
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     height: 1.2,
@@ -172,7 +182,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   children: [
                     Text(
                       "¿Todavía no tienes una cuenta? ",
-                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                      style: TextStyle(
+                        color: AnahuacColors
+                            .TEXT_SECONDARY, // Gris medio para no competir con el enlace
+                        fontSize: 16,
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -181,10 +195,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           MaterialPageRoute(builder: (context) => SignUpPage()),
                         );
                       },
-                      child: const Text(
+                      child: Text(
                         "Registrarse",
                         style: TextStyle(
-                          color: Color(0xFF00AFF5),
+                          color: AnahuacColors
+                              .PRIMARY_ORANGE, // El enlace de acción en naranja
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -204,9 +219,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.grey[400],
+        color:
+            AnahuacColors.TEXT_SECONDARY, // Gris profesional para las etiquetas
         fontSize: 14,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

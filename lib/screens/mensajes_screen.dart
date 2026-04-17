@@ -209,7 +209,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                   else
                     // Mostramos la información de su viaje
                     Card(
-                      color: AnahuacColors.BACKGROUND_WHITE,
+                      color: AnahuacColors.NEUTRAL_LIGHT_BG,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                         side: const BorderSide(
@@ -217,7 +217,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                           width: 2,
                         ),
                       ),
-                      elevation: 2,
+                      elevation: 4,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(

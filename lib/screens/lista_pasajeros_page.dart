@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'chat.dart'; // Asegúrate de importar tu ChatPage
+import '../themes/app_theme.dart'; // Importamos tu archivo de colores institucionales
 
 class ListaPasajerosPage extends StatelessWidget {
   final String viajeId;
@@ -14,18 +15,27 @@ class ListaPasajerosPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      // 1. Cambiamos el fondo oscuro por el blanco de fondo Anáhuac
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
-        title: const Text('Pasajeros del viaje'),
-        backgroundColor: const Color(0xFF191919),
+        title: const Text(
+          'Pasajeros del viaje',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        // 2. AppBar limpia y blanca, con texto oscuro para máximo contraste
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
       ),
       body: pasajeros.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
                 'Aún no hay pasajeros unidos a este viaje.',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(
+                  color: AnahuacColors
+                      .TEXT_SECONDARY, // Texto gris para estados vacíos
+                  fontSize: 16,
+                ),
               ),
             )
           : ListView.builder(
@@ -34,57 +44,73 @@ class ListaPasajerosPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final pasajero = pasajeros[index];
 
-                // Extraemos los datos (Asegúrate de que coincidan con las llaves de tu backend FastAPI)
                 final pasajeroId = pasajero['id'].toString();
                 final pasajeroNombre = pasajero['name'] ?? 'Usuario';
-
-                // CREAMOS UN ID DE CHAT ÚNICO: viajeId + pasajeroId
-                // Así Firestore separa los mensajes de cada persona
                 final chatUnicoId = '${viajeId}_$pasajeroId';
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2C2C2C),
+                    color: Colors.white, // Fondo puro para la tarjeta
                     borderRadius: BorderRadius.circular(12),
+                    // 3. Sombra sutil para darle profundidad y que no se pierda en el fondo blanco
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: ListTile(
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     leading: CircleAvatar(
-                      backgroundColor: const Color(0xFF00AFF5),
+                      // 4. Avatar con el Naranja principal
+                      backgroundColor: AnahuacColors.PRIMARY_ORANGE,
                       child: Text(
                         pasajeroNombre[0].toUpperCase(),
                         style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     title: Text(
                       pasajeroNombre,
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: AnahuacColors
+                            .TEXT_DARK, // Nombre en gris oscuro/negro suave
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    subtitle: const Text(
+                    subtitle: Text(
                       'Pasajero confirmado',
-                      style: TextStyle(color: Colors.white54, fontSize: 13),
+                      style: TextStyle(
+                        color: AnahuacColors
+                            .TEXT_SECONDARY, // Subtítulo más discreto
+                        fontSize: 13,
+                      ),
                     ),
                     trailing: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF00AFF5).withOpacity(0.1),
+                        // 5. Fondo suave del botón con el naranja Anáhuac
+                        color: AnahuacColors.PRIMARY_ORANGE.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.chat_bubble_rounded,
-                            color: Color(0xFF00AFF5)),
+                        icon: Icon(
+                          Icons.chat_bubble_rounded,
+                          color: AnahuacColors
+                              .PRIMARY_ORANGE, // Ícono naranja vibrante
+                        ),
                         tooltip: 'Enviar mensaje',
                         onPressed: () {
-                          // Navegamos al chat, pasándole el ID ÚNICO de esta conversación
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatPage(
                                 viajeId: chatUnicoId,
-                                // Opcional: Podrías modificar tu ChatPage para que reciba el nombre y lo ponga en el AppBar
                               ),
                             ),
                           );

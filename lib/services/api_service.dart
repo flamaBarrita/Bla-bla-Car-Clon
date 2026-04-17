@@ -33,7 +33,6 @@ class ApiService {
   /// Retorna un mapa con la información del perfil o null si hay error.
   Future<Map<String, dynamic>?> obtenerPerfil(String userId) async {
     try {
-      print(_baseUrl);
       final url = Uri.parse('$_baseUrl/profile/$userId');
       final headers = await _getSecureHeaders(); // añadimos seguridad
       final response = await http.get(url, headers: headers);

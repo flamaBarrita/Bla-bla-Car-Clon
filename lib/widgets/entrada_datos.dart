@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../themes/app_theme.dart'; // Importamos tu paleta Anáhuac
 
 class CustomInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -17,46 +18,62 @@ class CustomInputField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomInputFieldState createState() => _CustomInputFieldState();
+  State<CustomInputField> createState() => _CustomInputFieldState();
 }
 
 class _CustomInputFieldState extends State<CustomInputField> {
   bool _obscureText = true;
 
   @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.isPassword;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2C),
-        borderRadius: BorderRadius.circular(16),
+    return TextField(
+      controller: widget.controller,
+      obscureText: _obscureText,
+      keyboardType: widget.inputType,
+      // 1. LA SOLUCIÓN: Forzamos a que el texto que el usuario escribe sea oscuro
+      style: TextStyle(
+        color: AnahuacColors
+            .TEXT_DARK, // Gris oscuro/negro para que se lea perfecto
+        fontSize: 16,
       ),
-      child: TextField(
-        controller: widget.controller,
-        obscureText: widget.isPassword && _obscureText,
-        keyboardType: widget.inputType,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          prefixIcon: Icon(widget.icon, color: Colors.grey[500]),
-          suffixIcon: widget.isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey[500],
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                )
-              : null,
-          hintText: widget.hint,
-          hintStyle: TextStyle(color: Colors.grey[600]),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
+      decoration: InputDecoration(
+        hintText: widget.hint,
+        // 2. Color del texto fantasma (ejemplo@correo.com)
+        hintStyle: TextStyle(color: AnahuacColors.TEXT_SECONDARY),
+        // 3. Ícono de la izquierda en color institucional
+        prefixIcon: Icon(widget.icon, color: AnahuacColors.PRIMARY_ORANGE),
+        // Lógica del ojito para las contraseñas
+        suffixIcon: widget.isPassword
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey, // Ojito en gris neutro
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : null,
+        filled: true,
+        // 4. Fondo de la caja en gris MUY clarito para que resalte del fondo blanco del Scaffold
+        fillColor: Colors.grey[100],
+        // 5. Bordes redondeados sin línea dura por defecto
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        // 6. El toque premium: Cuando el usuario toca la caja, el borde se pinta de naranja
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: AnahuacColors.PRIMARY_ORANGE, width: 2),
         ),
       ),
     );

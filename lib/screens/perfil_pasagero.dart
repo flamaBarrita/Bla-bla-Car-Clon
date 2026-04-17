@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
+import '../themes/app_theme.dart'; // Importamos tu paleta Anáhuac
 
 class PerfilPasagero extends ConsumerStatefulWidget {
   final String passengerId;
@@ -44,60 +45,88 @@ class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      // Fondo blanco institucional
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF00AFF5)),
+          // Flecha de retroceso en naranja vibrante
+          icon: Icon(Icons.arrow_back, color: AnahuacColors.PRIMARY_ORANGE),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF00AFF5)),
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: AnahuacColors.PRIMARY_ORANGE),
             )
           : SingleChildScrollView(
               child: Center(
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
+                    // Avatar del usuario
                     Hero(
                       tag: 'avatar_${widget.initialName}',
-                      child: CircleAvatar(
-                        radius: 60,
-                        backgroundImage: NetworkImage(widget.initialPhoto),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          // Le damos un borde sutil naranja al avatar para que resalte
+                          border: Border.all(
+                            color:
+                                AnahuacColors.PRIMARY_ORANGE.withOpacity(0.5),
+                            width: 3,
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.grey[
+                              200], // Fondo por si tarda en cargar la imagen
+                          backgroundImage: NetworkImage(widget.initialPhoto),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Nombre del pasajero
                     Text(
                       _profileData?['name'] ?? widget.initialName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color:
+                            AnahuacColors.TEXT_DARK, // Gris oscuro/negro suave
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 40),
 
-                    // Mostramos la data del backend
+                    // Tarjeta de información del backend
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2C2C2C),
-                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.white, // Tarjeta blanca pura
+                          borderRadius: BorderRadius.circular(
+                              20), // Bordes más redondeados
+                          // Sombra premium para separarlo del fondo
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Biografía
-                            const Text(
+                            Text(
                               'Sobre mí',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AnahuacColors.TEXT_DARK,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -109,18 +138,24 @@ class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
                                   ? _profileData!['biography']
                                   : 'Sin información adicional.',
                               style: TextStyle(
-                                color: Colors.grey[300],
+                                color: AnahuacColors
+                                    .TEXT_SECONDARY, // Gris profesional
                                 fontSize: 16,
                                 height: 1.5,
                               ),
                             ),
-                            const Divider(color: Colors.grey, height: 32),
+
+                            // Separador más suave
+                            Divider(
+                                color: Colors.grey[200],
+                                height: 40,
+                                thickness: 1),
 
                             // Preferencias
-                            const Text(
+                            Text(
                               'Preferencias',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AnahuacColors.TEXT_DARK,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -132,28 +167,35 @@ class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
                                   ? _profileData!['preferences']
                                   : 'No especificadas.',
                               style: TextStyle(
-                                color: Colors.grey[300],
+                                color: AnahuacColors.TEXT_SECONDARY,
                                 fontSize: 16,
+                                height: 1.5,
                               ),
                             ),
-                            const Divider(color: Colors.grey, height: 32),
+
+                            Divider(
+                                color: Colors.grey[200],
+                                height: 40,
+                                thickness: 1),
 
                             // Vehículos
-                            const Text(
+                            Text(
                               'Vehículos',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AnahuacColors.TEXT_DARK,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 12),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.directions_car,
-                                  color: Color(0xFF00AFF5),
-                                  size: 20,
+                                  color: AnahuacColors
+                                      .PRIMARY_ORANGE, // Icono en color institucional
+                                  size: 22,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -163,8 +205,9 @@ class _PerfilPasageroState extends ConsumerState<PerfilPasagero> {
                                         ? _profileData!['vehicles']
                                         : 'No tiene vehículo registrado',
                                     style: TextStyle(
-                                      color: Colors.grey[300],
+                                      color: AnahuacColors.TEXT_SECONDARY,
                                       fontSize: 16,
+                                      height: 1.3,
                                     ),
                                   ),
                                 ),

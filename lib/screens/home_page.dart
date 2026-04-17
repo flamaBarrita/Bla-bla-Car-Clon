@@ -6,6 +6,7 @@ import '../widgets/navegacion_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/providers/app_providers.dart';
 import '../services/push_notifications.dart';
+import '../themes/app_theme.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -165,23 +166,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final userData = ref.watch(userProfileProvider);
     if (userData == null) {
       return const Scaffold(
-        backgroundColor: Color(0xFF191919),
-        body:
-            Center(child: CircularProgressIndicator(color: Color(0xFF00AFF5))),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
+        body: Center(
+            child:
+                CircularProgressIndicator(color: AnahuacColors.PRIMARY_ORANGE)),
       );
     }
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFF191919),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF191919),
+          backgroundColor: AnahuacColors.BACKGROUND_WHITE,
           elevation: 0,
           toolbarHeight: 10,
           bottom: const TabBar(
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
+            indicatorColor: AnahuacColors.PRIMARY_ORANGE,
+            labelColor: AnahuacColors.TEXT_DARK,
+            unselectedLabelColor: AnahuacColors.TEXT_LIGHT,
             tabs: [
               Tab(text: "Información personal"),
               Tab(text: "Cuenta"),
@@ -193,7 +195,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             // Si está descargando datos, mostramos un spinner. Si ya terminó, mostramos la UI.
             _isFetching
                 ? const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF00AFF5)),
+                    child: CircularProgressIndicator(
+                        color: AnahuacColors.PRIMARY_ORANGE),
                   )
                 : _buildPersonalInfoTab(),
             _buildAccountTab(),
@@ -214,8 +217,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             children: [
               const CircleAvatar(
                 radius: 40,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, size: 50, color: Colors.white),
+                backgroundColor: AnahuacColors.NEUTRAL_LIGHT_BG,
+                child: Icon(Icons.person,
+                    size: 50, color: AnahuacColors.TEXT_SECONDARY),
               ),
               const SizedBox(width: 20),
               Column(
@@ -224,14 +228,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   Text(
                     _userName,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AnahuacColors.TEXT_DARK,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     "Nuevo usuario",
-                    style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                    style: const TextStyle(
+                        color: AnahuacColors.TEXT_LIGHT, fontSize: 16),
                   ),
                 ],
               ),
@@ -242,7 +247,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const Text(
             "Acerca de ti",
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -269,7 +274,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const Text(
             "Vehículos",
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -302,8 +307,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: _isEditing
-                    ? const Color(0xFF00AFF5)
-                    : Colors.grey[800], // Azul para guardar, Gris para editar
+                    ? AnahuacColors.PRIMARY_ORANGE
+                    : AnahuacColors.NEUTRAL_BORDER,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
                 ),
@@ -338,7 +343,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const Text(
             "Tu cuenta",
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
@@ -346,36 +351,39 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const SizedBox(height: 20),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.star_outline, color: Colors.white),
+            leading: const Icon(Icons.star_outline,
+                color: AnahuacColors.PRIMARY_ORANGE),
             title: const Text(
               "Tus reseñas",
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: AnahuacColors.TEXT_DARK, fontSize: 18),
             ),
             trailing: const Icon(
               Icons.arrow_forward_ios,
-              color: Colors.grey,
+              color: AnahuacColors.TEXT_LIGHT,
               size: 16,
             ),
             onTap: () {},
           ),
-          const Divider(color: Colors.grey),
+          const Divider(color: AnahuacColors.NEUTRAL_BORDER),
           const Spacer(),
           SizedBox(
             width: double.infinity,
             height: 56,
             child: OutlinedButton.icon(
               onPressed: () => _signOut(context),
-              icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+              icon: const Icon(Icons.logout_rounded,
+                  color: AnahuacColors.ERROR_RED),
               label: const Text(
                 "Cerrar Sesión",
                 style: TextStyle(
-                  color: Colors.redAccent,
+                  color: AnahuacColors.ERROR_RED,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.redAccent, width: 2),
+                side:
+                    const BorderSide(color: AnahuacColors.ERROR_RED, width: 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
@@ -402,7 +410,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         Text(
           label,
           style: const TextStyle(
-            color: Color(0xFF00AFF5),
+            color: AnahuacColors.PRIMARY_ORANGE,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -411,17 +419,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          enabled: enabled, // Bloquea o desbloquea el campo
+          enabled: enabled,
           style: TextStyle(
-            color: enabled ? Colors.white : Colors.grey[400],
-          ), // Si está bloqueado, el texto es un poco más opaco
+            color: enabled
+                ? AnahuacColors.TEXT_DARK
+                : AnahuacColors.TEXT_SECONDARY,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[600]),
+            hintStyle: const TextStyle(color: AnahuacColors.TEXT_LIGHT),
             filled: true,
             fillColor: enabled
-                ? const Color(0xFF2C2C2C)
-                : const Color(0xFF1F1F1F), // Fondo más oscuro si está bloqueado
+                ? AnahuacColors.NEUTRAL_LIGHT_BG
+                : const Color(0xFFF0F0F0),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

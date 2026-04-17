@@ -12,10 +12,11 @@ import 'themes/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //await Firebase.initializeApp(
-  //    options: DefaultFirebaseOptions.currentPlatform,
-  //  );
+//    options: DefaultFirebaseOptions.currentPlatform,
+//  );
   await dotenv.load(fileName: ".env");
   runApp(
+    // Envolvemos toda la aplicación con ProviderScope para usar Riverpod
     ProviderScope(child: MyApp()),
   );
 }
@@ -51,20 +52,11 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Dame Ride!',
-      // ✅ NUEVO TEMA LIGHT PROFESIONAL ANÁHUAC
       theme: buildAnahuacTheme(),
-
-      // Ruta de inicio
+      // Nuestra primera acción es mandarlo a nuestro servicio de Auth y si esta autorizado puede entrar a la aplicación
       home: _AmplifyConfigurado
           ? Auth()
-          : const Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFFE85D2B), // Naranja Anáhuac
-                ),
-              ),
-            ),
+          : const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 }

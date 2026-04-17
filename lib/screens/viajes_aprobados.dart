@@ -4,6 +4,7 @@ import '../providers/app_providers.dart';
 import '/widgets/navegacion_button.dart';
 import '/screens/detalle_viaje.dart';
 import '/widgets/formatear_fecha.dart';
+import '../themes/app_theme.dart';
 
 class MisViajesScreen extends ConsumerStatefulWidget {
   const MisViajesScreen({Key? key}) : super(key: key);
@@ -44,27 +45,28 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         title: const Text(
           'Mis Viajes',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF191919),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
         automaticallyImplyLeading: false,
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF00AFF5)),
+              child: CircularProgressIndicator(
+                  color: AnahuacColors.PRIMARY_ORANGE),
             )
           : _misViajes.isEmpty
               ? _buildEmptyState()
               : RefreshIndicator(
                   // Permite al usuario deslizar hacia abajo para recargar
-                  color: const Color(0xFF00AFF5),
-                  backgroundColor: const Color(0xFF2C2C2C),
+                  color: AnahuacColors.PRIMARY_ORANGE,
+                  backgroundColor: AnahuacColors.NEUTRAL_LIGHT_BG,
                   onRefresh: _cargarMisViajes,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16.0),
@@ -88,13 +90,13 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
           Icon(
             Icons.directions_car_filled_outlined,
             size: 80,
-            color: Colors.grey[700],
+            color: AnahuacColors.TEXT_SECONDARY,
           ),
           const SizedBox(height: 16),
           const Text(
             'Aún no tienes viajes confirmados',
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -102,7 +104,7 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
           const SizedBox(height: 8),
           Text(
             'Busca una ruta y solicita unirte a un viaje.',
-            style: TextStyle(color: Colors.grey[500], fontSize: 14),
+            style: TextStyle(color: AnahuacColors.TEXT_LIGHT, fontSize: 14),
           ),
         ],
       ),
@@ -117,12 +119,12 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
     final fecha_formateda = formatearFechaEstetica(fecha);
 
     return Card(
-      color: const Color(0xFF2C2C2C),
+      color: AnahuacColors.NEUTRAL_LIGHT_BG,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: const Color(0xFF00AFF5).withOpacity(0.3),
+          color: AnahuacColors.PRIMARY_ORANGE.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -156,17 +158,18 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.2),
+                      color: AnahuacColors.SUCCESS_GREEN.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.check_circle, color: Colors.green, size: 14),
+                        Icon(Icons.check_circle,
+                            color: AnahuacColors.SUCCESS_GREEN, size: 14),
                         SizedBox(width: 4),
                         Text(
                           'Lugar Asegurado',
                           style: TextStyle(
-                            color: Colors.green,
+                            color: AnahuacColors.SUCCESS_GREEN,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -176,18 +179,19 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
                   ),
                   Text(
                     fecha_formateda,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    style: const TextStyle(
+                        color: AnahuacColors.TEXT_SECONDARY, fontSize: 14),
                   ),
                 ],
               ),
-              const Divider(color: Colors.grey, height: 24),
+              const Divider(color: AnahuacColors.NEUTRAL_BORDER, height: 24),
 
               // Ruta (Origen y Destino)
               Row(
                 children: [
                   const Icon(
                     Icons.radio_button_checked,
-                    color: Colors.white,
+                    color: AnahuacColors.TEXT_DARK,
                     size: 16,
                   ),
                   const SizedBox(width: 8),
@@ -195,7 +199,7 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
                     child: Text(
                       viaje['origin_name'] ?? 'Origen',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AnahuacColors.TEXT_DARK,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -207,13 +211,13 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
                 margin: const EdgeInsets.only(left: 7),
                 height: 16,
                 width: 2,
-                color: Colors.grey[700],
+                color: AnahuacColors.TEXT_SECONDARY,
               ),
               Row(
                 children: [
                   const Icon(
                     Icons.location_on,
-                    color: Color(0xFF00AFF5),
+                    color: AnahuacColors.PRIMARY_ORANGE,
                     size: 16,
                   ),
                   const SizedBox(width: 8),
@@ -221,7 +225,7 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
                     child: Text(
                       viaje['dest_name'] ?? 'Destino',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AnahuacColors.TEXT_DARK,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -235,24 +239,26 @@ class _MisViajesScreenState extends ConsumerState<MisViajesScreen> {
               // Conductor info rápida
               Row(
                 children: [
-                  const Icon(Icons.person, color: Colors.grey, size: 16),
+                  const Icon(Icons.person,
+                      color: AnahuacColors.TEXT_SECONDARY, size: 16),
                   const SizedBox(width: 8),
                   Text(
                     'Conductor: ${viaje['driver_name'] ?? 'Asignado'}',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                    style: const TextStyle(
+                        color: AnahuacColors.TEXT_LIGHT, fontSize: 14),
                   ),
                   const Spacer(),
                   const Text(
                     'Ver detalles',
                     style: TextStyle(
-                      color: Color(0xFF00AFF5),
+                      color: AnahuacColors.PRIMARY_ORANGE,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const Icon(
                     Icons.chevron_right,
-                    color: Color(0xFF00AFF5),
+                    color: AnahuacColors.PRIMARY_ORANGE,
                     size: 16,
                   ),
                 ],

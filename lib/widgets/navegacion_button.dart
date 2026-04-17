@@ -4,6 +4,7 @@ import '/screens/publicar_ruta.dart';
 import '/screens/mensajes_screen.dart';
 import '/screens/buscar_viaje.dart';
 import '/screens/viajes_aprobados.dart';
+import '../themes/app_theme.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -52,10 +53,10 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: const Color(0xFF00AFF5),
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: AnahuacColors.PRIMARY_ORANGE,
+      unselectedItemColor: AnahuacColors.TEXT_SECONDARY,
       currentIndex: currentIndex,
       onTap: (index) => _onItemTapped(context, index),
       items: [
@@ -80,7 +81,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(1),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color: AnahuacColors.ERROR_RED,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   constraints: const BoxConstraints(
@@ -89,7 +90,8 @@ class CustomBottomNavBar extends StatelessWidget {
                   ),
                   child: const Text(
                     '1',
-                    style: TextStyle(color: Colors.white, fontSize: 8),
+                    style: TextStyle(
+                        color: AnahuacColors.BACKGROUND_WHITE, fontSize: 8),
                     textAlign: TextAlign.center,
                   ),
                 ),

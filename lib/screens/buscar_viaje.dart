@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'buscar_ubicacion.dart';
 import 'resultados_busqueda_viaje.dart';
 import '/widgets/navegacion_button.dart';
+import '../themes/app_theme.dart';
 
 class SearchTripScreen extends StatefulWidget {
   const SearchTripScreen({Key? key}) : super(key: key);
@@ -48,7 +49,7 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor, selecciona origen y destino en el mapa'),
-          backgroundColor: Colors.red,
+          backgroundColor: AnahuacColors.ERROR_RED,
         ),
       );
       return;
@@ -71,15 +72,15 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         title: const Text(
           'Buscar viaje',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF191919),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
         automaticallyImplyLeading: false,
       ),
       body: Padding(
@@ -90,7 +91,7 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
             const Text(
               '¿A dónde quieres ir?',
               style: TextStyle(
-                color: Colors.white,
+                color: AnahuacColors.TEXT_DARK,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -100,7 +101,7 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
             // Contenedor que simula un formulario
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF2C2C2C),
+                color: AnahuacColors.NEUTRAL_LIGHT_BG,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -109,44 +110,47 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
                   ListTile(
                     leading: const Icon(
                       Icons.radio_button_checked,
-                      color: Colors.white,
+                      color: AnahuacColors.TEXT_DARK,
                     ),
                     title: Text(
                       _originName ?? 'Dejar en blanco para usar tu GPS',
                       style: TextStyle(
                         color: _originName == null
-                            ? Colors.grey[500]
-                            : Colors.white,
+                            ? AnahuacColors.TEXT_LIGHT
+                            : AnahuacColors.TEXT_DARK,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    trailing: const Icon(Icons.search, color: Colors.grey),
+                    trailing: const Icon(Icons.search,
+                        color: AnahuacColors.TEXT_SECONDARY),
                     onTap: () => _selectLocation(true),
                   ),
 
                   Container(
                     margin: const EdgeInsets.only(left: 50),
                     height: 1,
-                    color: Colors.grey[800],
+                    color: AnahuacColors.NEUTRAL_BORDER,
                   ),
 
                   // Botón de Destino
                   ListTile(
                     leading: const Icon(
                       Icons.location_on,
-                      color: Color(0xFF00AFF5),
+                      color: AnahuacColors.PRIMARY_ORANGE,
                     ),
                     title: Text(
                       _destName ?? 'Destino exacto',
                       style: TextStyle(
-                        color:
-                            _destName == null ? Colors.grey[500] : Colors.white,
+                        color: _destName == null
+                            ? AnahuacColors.TEXT_LIGHT
+                            : AnahuacColors.TEXT_DARK,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    trailing: const Icon(Icons.search, color: Colors.grey),
+                    trailing: const Icon(Icons.search,
+                        color: AnahuacColors.TEXT_SECONDARY),
                     onTap: () => _selectLocation(false),
                   ),
                 ],
@@ -162,7 +166,7 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
               child: ElevatedButton(
                 onPressed: _searchTrips,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00AFF5),
+                  backgroundColor: AnahuacColors.PRIMARY_ORANGE,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(28),
                   ),
@@ -172,7 +176,7 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AnahuacColors.BACKGROUND_WHITE,
                   ),
                 ),
               ),

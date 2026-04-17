@@ -4,6 +4,7 @@ import 'package:intl/intl.dart'; // Para formatear la fecha
 import 'confirmar_email.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/providers/app_providers.dart';
+import '../../themes/app_theme.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
   @override
@@ -25,9 +26,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   DateTime? _selectedDate;
   bool _wantsPromotions = false;
   bool _isPasswordVisible = false;
-
-  final Color _bg = const Color(0xFF191919);
-  final Color _blue = const Color(0xFF00AFF5);
 
   // Lógica navegación entre las páginas del Wizard
   void _nextPage() {
@@ -107,8 +105,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFFD32F2F),
+        content: Text(message,
+            style: const TextStyle(color: AnahuacColors.BACKGROUND_WHITE)),
+        backgroundColor: AnahuacColors.ERROR_RED,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -118,12 +117,13 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF00AFF5)),
+          icon:
+              const Icon(Icons.arrow_back, color: AnahuacColors.PRIMARY_ORANGE),
           onPressed: () {
             if (_currentPage > 0) {
               _pageController.previousPage(
@@ -158,12 +158,14 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               bottom: 20,
               right: 20,
               child: FloatingActionButton(
-                backgroundColor: _blue,
+                backgroundColor: AnahuacColors.PRIMARY_ORANGE,
                 elevation: 0,
                 onPressed: _isLoading ? null : _nextPage,
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Icon(Icons.arrow_forward, color: Colors.white),
+                    ? const CircularProgressIndicator(
+                        color: AnahuacColors.BACKGROUND_WHITE)
+                    : const Icon(Icons.arrow_forward,
+                        color: AnahuacColors.BACKGROUND_WHITE),
               ),
             ),
           ],
@@ -183,7 +185,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           const Text(
             "¿Cómo te llamas?",
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -218,18 +220,19 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: _bg, // Fondo oscuro
+                color: AnahuacColors.NEUTRAL_LIGHT_BG,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: _blue,
+                  color: AnahuacColors.PRIMARY_ORANGE,
                   width: 2,
-                ), // Borde azul al estar "seleccionado"
+                ),
               ),
               child: Text(
                 _selectedDate == null
                     ? "DD / MM / AAAA"
                     : DateFormat('d MMMM yyyy').format(_selectedDate!),
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(
+                    color: AnahuacColors.TEXT_DARK, fontSize: 18),
               ),
             ),
           ),
@@ -248,7 +251,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           const Text(
             "¿Cuál es tu e-mail?",
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -262,13 +265,14 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               Checkbox(
                 value: _wantsPromotions,
                 onChanged: (val) => setState(() => _wantsPromotions = val!),
-                activeColor: _blue,
-                side: const BorderSide(color: Colors.grey),
+                activeColor: AnahuacColors.PRIMARY_ORANGE,
+                side: const BorderSide(color: AnahuacColors.TEXT_SECONDARY),
               ),
               Expanded(
                 child: Text(
                   "No quiero recibir ofertas comerciales ni recomendaciones de BlaBlaCar por correo e-mail.",
-                  style: TextStyle(color: Colors.grey[300], fontSize: 14),
+                  style:
+                      TextStyle(color: AnahuacColors.TEXT_LIGHT, fontSize: 14),
                 ),
               ),
             ],
@@ -288,7 +292,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           const Text(
             "Establece tu contraseña",
             style: TextStyle(
-              color: Colors.white,
+              color: AnahuacColors.TEXT_DARK,
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -296,7 +300,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           const SizedBox(height: 10),
           Text(
             "Deberá contener al menos 8 caracteres, 1 letra, 1 número y 1 carácter especial.",
-            style: TextStyle(color: Colors.grey[400], fontSize: 14),
+            style: TextStyle(color: AnahuacColors.TEXT_LIGHT, fontSize: 14),
           ),
           const SizedBox(height: 30),
           _buildInput(_passwordController, "Contraseña", isPassword: true),
@@ -315,17 +319,17 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2C),
+        color: AnahuacColors.NEUTRAL_LIGHT_BG,
         borderRadius: BorderRadius.circular(16),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword && !_isPasswordVisible,
         keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: AnahuacColors.TEXT_DARK),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey[600]),
+          hintStyle: TextStyle(color: AnahuacColors.TEXT_LIGHT),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -337,7 +341,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     _isPasswordVisible
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.grey,
+                    color: AnahuacColors.TEXT_SECONDARY,
                   ),
                   onPressed: () =>
                       setState(() => _isPasswordVisible = !_isPasswordVisible),

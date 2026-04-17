@@ -5,6 +5,8 @@ import '../services/auth_service.dart';
 import '/widgets/navegacion_button.dart';
 import '/screens/perfil_pasagero.dart';
 import '../providers/app_providers.dart';
+import 'lista_pasajeros_page.dart';
+import '../themes/app_theme.dart';
 
 class MessagesScreen extends ConsumerStatefulWidget {
   const MessagesScreen({Key? key}) : super(key: key);
@@ -56,28 +58,28 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF2C2C2C),
+          backgroundColor: AnahuacColors.BACKGROUND_WHITE,
           title: const Text(
             '¿Eliminar viaje?',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: AnahuacColors.TEXT_DARK),
           ),
           content: const Text(
             'Esta acción cancelará el viaje. Se notificará a los pasajeros (si los hay) y ya no aparecerás en las búsquedas.',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: AnahuacColors.TEXT_SECONDARY),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text(
                 'No, mantener',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AnahuacColors.TEXT_SECONDARY),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text(
                 'Sí, eliminar',
-                style: TextStyle(color: Colors.redAccent),
+                style: TextStyle(color: AnahuacColors.ERROR_RED),
               ),
             ),
           ],
@@ -99,7 +101,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
               'Viaje cancelado exitosamente',
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AnahuacColors.SUCCESS_GREEN,
           ),
         );
         setState(() {
@@ -113,7 +115,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
               'Error al cancelar el viaje',
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: Colors.redAccent,
+            backgroundColor: AnahuacColors.ERROR_RED,
           ),
         );
       }
@@ -140,7 +142,9 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                 ? '¡Pasajero aceptado!'
                 : 'Solicitud rechazada',
           ),
-          backgroundColor: respuesta == 'aceptado' ? Colors.green : Colors.red,
+          backgroundColor: respuesta == 'aceptado'
+              ? AnahuacColors.SUCCESS_GREEN
+              : AnahuacColors.ERROR_RED,
         ),
       );
     } else {
@@ -148,7 +152,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error al procesar la solicitud'),
-          backgroundColor: Colors.red,
+          backgroundColor: AnahuacColors.ERROR_RED,
         ),
       );
     }
@@ -157,20 +161,21 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         title: const Text(
           'Bandeja de entrada',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF191919),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
         automaticallyImplyLeading: false,
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF00AFF5)),
+              child: CircularProgressIndicator(
+                  color: AnahuacColors.PRIMARY_ORANGE),
             )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -180,7 +185,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                   const Text(
                     'Tu viaje activo',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AnahuacColors.TEXT_DARK,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -191,150 +196,187 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C2C),
+                        color: AnahuacColors.NEUTRAL_LIGHT_BG,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Center(
                         child: Text(
                           'No tienes viajes publicados activos.',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: AnahuacColors.TEXT_DARK),
                         ),
                       ),
                     )
                   else
                     // Mostramos la información de su viaje
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C2C),
+                    Card(
+                      color: AnahuacColors.BACKGROUND_WHITE,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xFF00AFF5).withOpacity(0.5),
-                          width: 1,
+                        side: const BorderSide(
+                          color: AnahuacColors.PRIMARY_ORANGE,
+                          width: 2,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _activeTrip!['duration_text'] ?? 'Tiempo est.',
-                                style: const TextStyle(
-                                  color: Color(0xFF00AFF5),
-                                  fontWeight: FontWeight.bold,
+                      elevation: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _activeTrip!['duration_text'] ??
+                                      'Tiempo est.',
+                                  style: const TextStyle(
+                                    color: AnahuacColors.PRIMARY_ORANGE,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-
-                              // Mostramos que el viaje esta publicado y el botón de eliminar viaje
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
+                                // Mostramos que el viaje esta publicado y el botón de eliminar viaje
+                                Row(
+                                  children: [
+                                    // Boton para mensajeria con los pasajeros
+                                    IconButton(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.people_outline,
+                                        color: AnahuacColors.PRIMARY_ORANGE,
+                                        size: 20,
+                                      ),
+                                      constraints: const BoxConstraints(),
+                                      onPressed: () {
+                                        // Obtenemos la lista de pasajeros del JSON del viaje
+                                        // (Ajusta 'passengers' por la llave real que uses en tu backend)
+                                        final List<dynamic> listaPasajeros =
+                                            _activeTrip!['passengers'] ?? [];
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ListaPasajerosPage(
+                                              viajeId:
+                                                  _activeTrip!['id'].toString(),
+                                              pasajeros: listaPasajeros,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Text(
-                                      'Publicado',
-                                      style: TextStyle(
-                                        color: Colors.green,
-                                        fontSize: 12,
+                                    // ----------------------------------
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AnahuacColors.SUCCESS_GREEN
+                                            .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Text(
+                                        'Publicado',
+                                        style: TextStyle(
+                                          color: AnahuacColors.SUCCESS_GREEN,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  // El botón del basurero
-                                  _isDeleting
-                                      ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.red,
-                                            strokeWidth: 2,
+                                    const SizedBox(width: 8),
+                                    // El botón del basurero
+                                    _isDeleting
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: AnahuacColors.ERROR_RED,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : IconButton(
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                              color: AnahuacColors.ERROR_RED,
+                                              size: 20,
+                                            ),
+                                            constraints:
+                                                const BoxConstraints(), // Quita el padding por defecto del botón
+                                            padding: EdgeInsets.zero,
+                                            onPressed: () =>
+                                                _confirmarYEliminarViaje(
+                                              _activeTrip!['id'].toString(),
+                                            ),
                                           ),
-                                        )
-                                      : IconButton(
-                                          icon: const Icon(
-                                            Icons.delete_outline,
-                                            color: Colors.redAccent,
-                                            size: 20,
-                                          ),
-                                          constraints:
-                                              const BoxConstraints(), // Quita el padding por defecto del botón
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () =>
-                                              _confirmarYEliminarViaje(
-                                            _activeTrip!['id'].toString(),
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const Divider(color: Colors.grey, height: 24),
-                          // Mostramos la ruta de origen del viaje
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.radio_button_checked,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _activeTrip!['origin_name'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              margin: const EdgeInsets.only(left: 7),
-                              height: 20,
-                              width: 2,
-                              color: Colors.grey[700],
+                              ],
                             ),
-                          ),
-                          // Mostramos la ruta de destino del viaje
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.location_on,
-                                color: Color(0xFF00AFF5),
-                                size: 16,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _activeTrip!['dest_name'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                            const Divider(
+                                color: AnahuacColors.NEUTRAL_BORDER,
+                                height: 24),
+                            // Mostramos la ruta de origen del viaje
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.radio_button_checked,
+                                  color: AnahuacColors.PRIMARY_ORANGE,
+                                  size: 16,
                                 ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _activeTrip!['origin_name'],
+                                    style: const TextStyle(
+                                      color: AnahuacColors.TEXT_DARK,
+                                      fontSize: 16,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.only(left: 7),
+                                height: 20,
+                                width: 2,
+                                color: AnahuacColors.NEUTRAL_BORDER,
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            // Mostramos la ruta de destino del viaje
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  color: AnahuacColors.PRIMARY_ORANGE,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _activeTrip!['dest_name'],
+                                    style: const TextStyle(
+                                      color: AnahuacColors.TEXT_DARK,
+                                      fontSize: 16,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   const SizedBox(height: 32),
                   const Text(
                     'Peticiones de ingreso',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AnahuacColors.TEXT_DARK,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -347,7 +389,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                         padding: const EdgeInsets.all(32.0),
                         child: Text(
                           'No tienes solicitudes pendientes.',
-                          style: TextStyle(color: Colors.grey[500]),
+                          style: TextStyle(color: AnahuacColors.TEXT_SECONDARY),
                         ),
                       ),
                     )
@@ -378,7 +420,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                             solicitud['passenger_id']?.toString() ?? '';
 
                         return Card(
-                          color: const Color(0xFF2C2C2C),
+                          color: AnahuacColors.BACKGROUND_WHITE,
                           margin: const EdgeInsets.only(bottom: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -425,7 +467,8 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                               Text(
                                                 pName,
                                                 style: const TextStyle(
-                                                  color: Colors.white,
+                                                  color:
+                                                      AnahuacColors.TEXT_DARK,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
                                                 ),
@@ -437,28 +480,32 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                                 children: [
                                                   const Icon(
                                                     Icons.star,
-                                                    color: Colors.amber,
+                                                    color: AnahuacColors
+                                                        .WARNING_AMBER,
                                                     size: 14,
                                                   ),
                                                   const SizedBox(width: 4),
                                                   Text(
                                                     pRating,
-                                                    style: TextStyle(
-                                                      color: Colors.grey[400],
+                                                    style: const TextStyle(
+                                                      color: AnahuacColors
+                                                          .TEXT_SECONDARY,
                                                       fontSize: 12,
                                                     ),
                                                   ),
                                                   const SizedBox(width: 8),
                                                   const Icon(
                                                     Icons.person,
-                                                    color: Colors.grey,
+                                                    color: AnahuacColors
+                                                        .TEXT_SECONDARY,
                                                     size: 14,
                                                   ),
                                                   const SizedBox(width: 4),
                                                   Text(
                                                     '$pSeats asient.',
-                                                    style: TextStyle(
-                                                      color: Colors.grey[400],
+                                                    style: const TextStyle(
+                                                      color: AnahuacColors
+                                                          .TEXT_SECONDARY,
                                                       fontSize: 12,
                                                     ),
                                                   ),
@@ -478,7 +525,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                       width: 20,
                                       height: 20,
                                       child: CircularProgressIndicator(
-                                        color: Color(0xFF00AFF5),
+                                        color: AnahuacColors.PRIMARY_ORANGE,
                                         strokeWidth: 2,
                                       ),
                                     ),
@@ -488,7 +535,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                   IconButton(
                                     icon: const Icon(
                                       Icons.close,
-                                      color: Colors.red,
+                                      color: AnahuacColors.ERROR_RED,
                                     ),
                                     onPressed: () =>
                                         _responder(index, 'rechazado'),
@@ -496,7 +543,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                   Container(
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(0xFF00AFF5),
+                                      color: AnahuacColors.PRIMARY_ORANGE,
                                     ),
                                     child: IconButton(
                                       icon: const Icon(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/providers/app_providers.dart';
+import '../themes/app_theme.dart';
 
 class SetPriceScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> tripData;
@@ -66,7 +67,7 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('¡Viaje publicado con éxito! 🚗💨'),
-            backgroundColor: Colors.green,
+            backgroundColor: AnahuacColors.SUCCESS_GREEN,
             duration: Duration(seconds: 3),
           ),
         );
@@ -78,7 +79,7 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al publicar: $e'),
-            backgroundColor: Colors.redAccent,
+            backgroundColor: AnahuacColors.ERROR_RED,
           ),
         );
       }
@@ -90,11 +91,11 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
       ),
       body: SafeArea(
         child: Column(
@@ -109,28 +110,29 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                     const Text(
                       "Detalles finales",
                       style: TextStyle(
-                          color: Colors.white,
+                          color: AnahuacColors.TEXT_DARK,
                           fontSize: 32,
                           fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       "Fija tu aportación por asiento y cuántos pasajeros puedes llevar.",
-                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                      style: TextStyle(
+                          color: AnahuacColors.TEXT_LIGHT, fontSize: 16),
                     ),
                     const SizedBox(height: 40),
 
                     // Guardamos el costo del viaje del conductor
                     const Text("Aportación por persona",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AnahuacColors.TEXT_DARK,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C2C),
+                        color: AnahuacColors.NEUTRAL_LIGHT_BG,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
@@ -138,7 +140,7 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                         children: [
                           const Text("\$",
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: AnahuacColors.TEXT_DARK,
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(width: 10),
@@ -148,13 +150,14 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                               controller: _priceController,
                               keyboardType: TextInputType.number,
                               style: const TextStyle(
-                                  color: Color(0xFF00AFF5),
+                                  color: AnahuacColors.PRIMARY_ORANGE,
                                   fontSize: 48,
                                   fontWeight: FontWeight.bold),
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "0",
-                                hintStyle: TextStyle(color: Colors.grey),
+                                hintStyle:
+                                    TextStyle(color: AnahuacColors.TEXT_LIGHT),
                               ),
                               onChanged: (val) => setState(() {}),
                             ),
@@ -167,7 +170,7 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                     // Guardamos la cantidad de asientos disponibles
                     const Text("Asientos disponibles",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AnahuacColors.TEXT_DARK,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
@@ -175,7 +178,7 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 15),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C2C),
+                        color: AnahuacColors.NEUTRAL_LIGHT_BG,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
@@ -188,8 +191,8 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                                 : null,
                             icon: Icon(Icons.remove_circle_outline,
                                 color: _asientos > 1
-                                    ? const Color(0xFF00AFF5)
-                                    : Colors.grey,
+                                    ? AnahuacColors.PRIMARY_ORANGE
+                                    : AnahuacColors.TEXT_SECONDARY,
                                 size: 32),
                           ),
 
@@ -197,7 +200,7 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                           Text(
                             "$_asientos",
                             style: const TextStyle(
-                                color: Colors.white,
+                                color: AnahuacColors.TEXT_DARK,
                                 fontSize: 36,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -209,8 +212,8 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                                 : null,
                             icon: Icon(Icons.add_circle_outline,
                                 color: _asientos < 6
-                                    ? const Color(0xFF00AFF5)
-                                    : Colors.grey,
+                                    ? AnahuacColors.PRIMARY_ORANGE
+                                    : AnahuacColors.TEXT_SECONDARY,
                                 size: 32),
                           ),
                         ],
@@ -234,16 +237,17 @@ class _SetPriceScreenState extends ConsumerState<SetPriceScreen> {
                           ? _publicarViaje
                           : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00AFF5),
-                    disabledBackgroundColor: Colors.grey[800],
+                    backgroundColor: AnahuacColors.PRIMARY_ORANGE,
+                    disabledBackgroundColor: AnahuacColors.TEXT_SECONDARY,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28)),
                   ),
                   child: _isPublishing
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(
+                          color: AnahuacColors.BACKGROUND_WHITE)
                       : const Text("Publicar viaje",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: AnahuacColors.BACKGROUND_WHITE,
                               fontSize: 18,
                               fontWeight: FontWeight.bold)),
                 ),

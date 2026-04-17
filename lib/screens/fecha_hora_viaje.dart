@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'precio_viaje.dart';
+import '../themes/app_theme.dart';
 
 class SelectDateTimeScreen extends StatefulWidget {
   final Map<String, dynamic>
@@ -25,11 +26,11 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
           DateTime.now().add(const Duration(days: 30)), // Máximo 1 mes a futuro
       builder: (context, child) {
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF00AFF5),
-              onPrimary: Colors.white,
-              surface: Color(0xFF2C2C2C),
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AnahuacColors.PRIMARY_ORANGE,
+              onPrimary: AnahuacColors.BACKGROUND_WHITE,
+              surface: AnahuacColors.NEUTRAL_LIGHT_BG,
             ),
           ),
           child: child!,
@@ -45,10 +46,10 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
       initialTime: TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF00AFF5),
-              surface: Color(0xFF2C2C2C),
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AnahuacColors.PRIMARY_ORANGE,
+              surface: AnahuacColors.NEUTRAL_LIGHT_BG,
             ),
           ),
           child: child!,
@@ -78,11 +79,11 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -92,7 +93,7 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
             const Text(
               "¿Cuándo sales?",
               style: TextStyle(
-                  color: Colors.white,
+                  color: AnahuacColors.TEXT_DARK,
                   fontSize: 32,
                   fontWeight: FontWeight.bold),
             ),
@@ -101,37 +102,40 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
             // Botón para Fecha
             ListTile(
               onTap: _pickDate,
-              tileColor: const Color(0xFF2C2C2C),
+              tileColor: AnahuacColors.NEUTRAL_LIGHT_BG,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
-              leading:
-                  const Icon(Icons.calendar_month, color: Color(0xFF00AFF5)),
+              leading: const Icon(Icons.calendar_month,
+                  color: AnahuacColors.PRIMARY_ORANGE),
               title: Text(
                 _selectedDate == null
                     ? "Seleccionar fecha"
                     : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(
+                    color: AnahuacColors.TEXT_DARK, fontSize: 18),
               ),
               trailing: const Icon(Icons.arrow_forward_ios,
-                  color: Colors.grey, size: 16),
+                  color: AnahuacColors.TEXT_SECONDARY, size: 16),
             ),
             const SizedBox(height: 20),
 
             // Botón para Hora
             ListTile(
               onTap: _pickTime,
-              tileColor: const Color(0xFF2C2C2C),
+              tileColor: AnahuacColors.NEUTRAL_LIGHT_BG,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
-              leading: const Icon(Icons.access_time, color: Color(0xFF00AFF5)),
+              leading: const Icon(Icons.access_time,
+                  color: AnahuacColors.PRIMARY_ORANGE),
               title: Text(
                 _selectedTime == null
                     ? "Seleccionar hora"
                     : _selectedTime!.format(context),
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(
+                    color: AnahuacColors.TEXT_DARK, fontSize: 18),
               ),
               trailing: const Icon(Icons.arrow_forward_ios,
-                  color: Colors.grey, size: 16),
+                  color: AnahuacColors.TEXT_SECONDARY, size: 16),
             ),
 
             const Spacer(),
@@ -145,14 +149,14 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
                     ? _continuar
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00AFF5),
-                  disabledBackgroundColor: Colors.grey[800],
+                  backgroundColor: AnahuacColors.PRIMARY_ORANGE,
+                  disabledBackgroundColor: AnahuacColors.TEXT_SECONDARY,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28)),
                 ),
                 child: const Text("Continuar",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: AnahuacColors.BACKGROUND_WHITE,
                         fontSize: 18,
                         fontWeight: FontWeight.bold)),
               ),

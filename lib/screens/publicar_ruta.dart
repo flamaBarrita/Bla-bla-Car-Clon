@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/navegacion_button.dart';
 import 'buscar_ubicacion.dart';
 import 'seleccionar_ruta.dart';
+import '../themes/app_theme.dart';
 
 class PublishRouteScreen extends StatefulWidget {
   const PublishRouteScreen({Key? key}) : super(key: key);
@@ -53,15 +54,15 @@ class _PublishRouteScreenState extends State<PublishRouteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         title: const Text(
           'Publicar un viaje',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF191919),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
         automaticallyImplyLeading:
             false, // Ocultamos la flecha de atrás porque es pantalla principal
       ),
@@ -75,14 +76,14 @@ class _PublishRouteScreenState extends State<PublishRouteScreen> {
               const Icon(
                 Icons.directions_car_filled_outlined,
                 size: 120,
-                color: Color(0xFF00AFF5),
+                color: AnahuacColors.PRIMARY_ORANGE,
               ),
               const SizedBox(height: 30),
 
               const Text(
                 "¿Listo para tu próximo viaje?",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AnahuacColors.TEXT_DARK,
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
@@ -92,7 +93,8 @@ class _PublishRouteScreenState extends State<PublishRouteScreen> {
 
               Text(
                 "Comparte tus gastos de viaje llevando pasajeros contigo.",
-                style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                style: TextStyle(
+                    color: AnahuacColors.TEXT_SECONDARY, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 50),
@@ -117,7 +119,7 @@ class _PublishRouteScreenState extends State<PublishRouteScreen> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00AFF5), // Tu azul cian
+                    backgroundColor: AnahuacColors.PRIMARY_ORANGE,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
                     ),

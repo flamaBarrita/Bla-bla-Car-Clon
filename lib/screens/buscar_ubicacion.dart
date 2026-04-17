@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../services/google_maps.dart';
 import 'package:geolocator/geolocator.dart';
+import '../themes/app_theme.dart';
 
 class SearchLocationScreen extends StatefulWidget {
   final String title;
@@ -131,12 +132,13 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF00AFF5)),
+          icon:
+              const Icon(Icons.arrow_back, color: AnahuacColors.PRIMARY_ORANGE),
           onPressed: () {
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
@@ -152,7 +154,7 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
-            color: Colors.white,
+            color: AnahuacColors.TEXT_DARK,
           ),
         ),
       ),
@@ -165,19 +167,21 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2C2C2C),
+                    color: AnahuacColors.NEUTRAL_LIGHT_BG,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
                     controller: _searchController,
                     onChanged: _onSearchChanged,
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: AnahuacColors.TEXT_DARK),
                     decoration: InputDecoration(
                       hintText: 'Ingresa la dirección completa',
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      hintStyle: TextStyle(color: AnahuacColors.TEXT_LIGHT),
+                      prefixIcon: const Icon(Icons.search,
+                          color: AnahuacColors.TEXT_SECONDARY),
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
+                        icon: const Icon(Icons.close,
+                            color: AnahuacColors.TEXT_SECONDARY),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _predictions = []);
@@ -191,23 +195,23 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
               //spread operator para meter varios widgets en un if
               if (widget.title == '¿Desde dónde sales?') ...[
                 ListTile(
-                  leading: const Icon(Icons.my_location, color: Colors.white),
+                  leading: const Icon(Icons.my_location,
+                      color: AnahuacColors.TEXT_DARK),
                   title: const Text(
                     'Utilizar ubicación actual',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AnahuacColors.TEXT_DARK,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   trailing: const Icon(
                     Icons.arrow_forward_ios,
-                    color: Colors.grey,
+                    color: AnahuacColors.TEXT_SECONDARY,
                     size: 16,
                   ),
-                  onTap:
-                      _useCurrentLocation, // Llamamos a la función para usar el GPS
+                  onTap: _useCurrentLocation,
                 ),
-                const Divider(color: Colors.grey, height: 1),
+                const Divider(color: AnahuacColors.NEUTRAL_BORDER, height: 1),
               ],
               Expanded(
                 child: ListView.builder(
@@ -215,18 +219,19 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                   itemBuilder: (context, index) {
                     final place = _predictions[index];
                     return ListTile(
-                      leading: const Icon(Icons.schedule, color: Colors.grey),
+                      leading: const Icon(Icons.schedule,
+                          color: AnahuacColors.TEXT_SECONDARY),
                       title: Text(
                         place['structured_formatting']['main_text'],
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AnahuacColors.TEXT_DARK),
                       ),
                       subtitle: Text(
                         place['structured_formatting']['secondary_text'],
-                        style: TextStyle(color: Colors.grey[400]),
+                        style: const TextStyle(color: AnahuacColors.TEXT_LIGHT),
                       ),
                       trailing: const Icon(
                         Icons.arrow_forward_ios,
-                        color: Colors.grey,
+                        color: AnahuacColors.TEXT_SECONDARY,
                         size: 16,
                       ),
                       onTap: () =>
@@ -241,7 +246,8 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
             Container(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF00AFF5)),
+                child: CircularProgressIndicator(
+                    color: AnahuacColors.PRIMARY_ORANGE),
               ),
             ),
         ],

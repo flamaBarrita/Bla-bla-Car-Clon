@@ -4,6 +4,7 @@ import '../providers/app_providers.dart';
 import 'perfil_pasagero.dart';
 import '/widgets/formatear_fecha.dart';
 import '/screens/chat.dart';
+import '../themes/app_theme.dart';
 
 class DetalleViajeScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> viaje;
@@ -22,28 +23,28 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2C),
+        backgroundColor: AnahuacColors.NEUTRAL_LIGHT_BG,
         title: const Text(
           '¿Cancelar tu lugar?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AnahuacColors.TEXT_DARK),
         ),
         content: const Text(
           'El conductor será notificado y perderás tu asiento reservado en este viaje.',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: AnahuacColors.TEXT_SECONDARY),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: const Text(
               'No, mantener',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AnahuacColors.TEXT_SECONDARY),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text(
               'Sí, cancelar',
-              style: TextStyle(color: Colors.redAccent),
+              style: TextStyle(color: AnahuacColors.ERROR_RED),
             ),
           ),
         ],
@@ -70,7 +71,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
               content: Text(
                 'Lugar cancelado. El conductor ha sido notificado.',
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AnahuacColors.SUCCESS_GREEN,
             ),
           );
           Navigator.pop(context, true);
@@ -78,7 +79,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Error al cancelar el lugar'),
-              backgroundColor: Colors.redAccent,
+              backgroundColor: AnahuacColors.ERROR_RED,
             ),
           );
         }
@@ -97,12 +98,12 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
     final fecha_formateada = formatearFechaEstetica(fecha);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF191919),
+      backgroundColor: AnahuacColors.BACKGROUND_WHITE,
       appBar: AppBar(
         title: const Text('Detalles del viaje'),
-        backgroundColor: const Color(0xFF191919),
+        backgroundColor: AnahuacColors.BACKGROUND_WHITE,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AnahuacColors.TEXT_DARK,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -119,13 +120,13 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.2),
+                    color: AnahuacColors.SUCCESS_GREEN.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
                     'Lugar Asegurado',
                     style: TextStyle(
-                      color: Colors.green,
+                      color: AnahuacColors.SUCCESS_GREEN,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -133,7 +134,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                 Text(
                   '\$${widget.viaje['price'] ?? '0.00'}',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AnahuacColors.TEXT_DARK,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -146,7 +147,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF2C2C2C),
+                color: AnahuacColors.NEUTRAL_LIGHT_BG,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -156,26 +157,27 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                     children: [
                       const Icon(
                         Icons.calendar_today,
-                        color: Color(0xFF00AFF5),
+                        color: AnahuacColors.PRIMARY_ORANGE,
                         size: 16,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         fecha_formateada,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AnahuacColors.TEXT_DARK,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  const Divider(color: Colors.grey, height: 30),
+                  const Divider(
+                      color: AnahuacColors.NEUTRAL_BORDER, height: 30),
                   Row(
                     children: [
                       const Icon(
                         Icons.radio_button_checked,
-                        color: Colors.white,
+                        color: AnahuacColors.TEXT_DARK,
                         size: 20,
                       ),
                       const SizedBox(width: 12),
@@ -183,7 +185,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                         child: Text(
                           widget.viaje['origin_name'] ?? 'Origen',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AnahuacColors.TEXT_DARK,
                             fontSize: 16,
                           ),
                         ),
@@ -194,13 +196,13 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                     margin: const EdgeInsets.only(left: 9),
                     height: 24,
                     width: 2,
-                    color: Colors.grey[700],
+                    color: AnahuacColors.TEXT_SECONDARY,
                   ),
                   Row(
                     children: [
                       const Icon(
                         Icons.location_on,
-                        color: Color(0xFF00AFF5),
+                        color: AnahuacColors.PRIMARY_ORANGE,
                         size: 20,
                       ),
                       const SizedBox(width: 12),
@@ -208,7 +210,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                         child: Text(
                           widget.viaje['dest_name'] ?? 'Destino',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AnahuacColors.TEXT_DARK,
                             fontSize: 16,
                           ),
                         ),
@@ -224,7 +226,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
             const Text(
               'Tu conductor',
               style: TextStyle(
-                color: Colors.white,
+                color: AnahuacColors.TEXT_DARK,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -247,7 +249,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2C2C2C),
+                  color: AnahuacColors.NEUTRAL_LIGHT_BG,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -264,7 +266,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                           Text(
                             widget.viaje['driver_name'] ?? 'Conductor',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AnahuacColors.TEXT_DARK,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -274,7 +276,7 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                             children: [
                               const Icon(
                                 Icons.directions_car,
-                                color: Colors.grey,
+                                color: AnahuacColors.TEXT_SECONDARY,
                                 size: 14,
                               ),
                               const SizedBox(width: 4),
@@ -282,8 +284,8 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                                 child: Text(
                                   widget.viaje['driver_vehicles'] ??
                                       'Auto estándar',
-                                  style: TextStyle(
-                                    color: Colors.grey[400],
+                                  style: const TextStyle(
+                                    color: AnahuacColors.TEXT_LIGHT,
                                     fontSize: 14,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -295,7 +297,8 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                         ],
                       ),
                     ),
-                    const Icon(Icons.chevron_right, color: Colors.grey),
+                    const Icon(Icons.chevron_right,
+                        color: AnahuacColors.TEXT_SECONDARY),
                   ],
                 ),
               ),
@@ -323,8 +326,8 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00AFF5),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AnahuacColors.PRIMARY_ORANGE,
+                  foregroundColor: AnahuacColors.BACKGROUND_WHITE,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -336,13 +339,14 @@ class _DetalleViajeScreenState extends ConsumerState<DetalleViajeScreen> {
             // Botón de cancelar
             Center(
               child: _isCanceling
-                  ? const CircularProgressIndicator(color: Colors.red)
+                  ? const CircularProgressIndicator(
+                      color: AnahuacColors.ERROR_RED)
                   : TextButton(
                       onPressed: _cancelarMiLugar,
                       child: const Text(
                         'Cancelar mi lugar',
                         style: TextStyle(
-                          color: Colors.redAccent,
+                          color: AnahuacColors.ERROR_RED,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
